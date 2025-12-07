@@ -4,6 +4,19 @@
     box-sizing: border-box;
 }
 :root {
+    --bg: #f0f2f5;
+    --panel-bg: #ffffff;
+    --received-bg: #e4e6eb; /* light bubble */
+    --sent-bg: #0084ff; /* messenger blue */
+    --sent-text: #ffffff;
+    --text-received: #050505;
+    --muted: #6b6f76;
+    --accent: #00a2ff;
+    --shadow: 0 6px 18px rgba(5, 10, 20, 0.08);
+    --radius: 18px;
+    --max-width-desktop: 720px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
     --app-bg: #e0e1e3;
     --main-container: #dff1fd;
     --app-container: #ffffff;
@@ -11,7 +24,9 @@
     --blue: #0081d7;
     --unread-msg: #7b8286;
     --time: #182a34;
-    --active-chat: #cde8f6;
+    --active-chat: #f2f3f4;
+    --online: #009e02;
+    --offline: #869296;
 }
 
 body {
@@ -74,18 +89,81 @@ body {
         width 0.3s ease;
     z-index: 5;
 }
-
+.chat-header {
+    position: absolute;
+    top: 0;
+    left: 30.7%;
+    width: 69.2%;
+    height: 55px;
+    background: var(--app-container);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1rem;
+    transition:
+        left 0.3s ease,
+        width 0.3s ease;
+    z-index: 10;
+}
+.chat-header .user {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+}
+.chat-header .user img {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-right: 0.3rem;
+    border: 2px solid var(--text);
+}
+.chat-header .user .user-name {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    justify-content: left;
+}
+.chat-header .user .user-name span {
+    font-weight: 800;
+    color: var(--blue);
+}
+.chat-header .user .user-name p {
+    font-weight: 800;
+    color: var(--unread-msg);
+    font-size: 14px;
+}
 .chatbox {
     position: absolute;
     top: 57px;
     left: 30.7%;
     width: 69.2%;
-    padding: 0.5rem 1rem;
+    padding: 0 1rem;
     height: calc(100% - 115px);
     background: var(--app-container);
+    /*
     display: flex;
     justify-content: space-between;
     align-items: center;
+    */
+    transition:
+        left 0.3s ease,
+        width 0.3s ease;
+    overflow: auto;
+}
+.home-page {
+    position: absolute;
+    top: 0;
+    left: 30.7%;
+    width: 69.2%;
+    padding: 0 1rem;
+    height: 100%;
+    background: var(--app-container);
+    /*
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    */
     transition:
         left 0.3s ease,
         width 0.3s ease;
@@ -166,25 +244,40 @@ body {
     border-radius: 2px;
 }
 .users-list a {
+    position: relative;
     text-decoration: none;
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
+    padding: 0.3rem 0;
 }
 .users-list a .left {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
-.users-list a .left img {
+.users-list a .left .user-img {
+    position: relative;
+}
+.users-list a .left .user-img img {
     width: 50px;
     height: 50px;
     object-fit: cover;
     border-radius: 50%;
     border: 2px solid var(--text);
     margin-right: 4px;
+}
+.users-list a .left .user-img .status {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    right: 5px;
+    bottom: 5px;
+    background: var(--online);
+    border: 1px solid #ffffff;
 }
 .users-list a .left .name {
     display: flex;
@@ -208,12 +301,178 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.users-list a .right {
+    position: absolute;
+    bottom: 0;
+    right: 3px;
+}
 .users-list a .right time {
     color: var(--time);
     font-size: 11px;
     font-weight: 800;
     border-radius: 15px;
     font-style: italic;
+}
+.chatbox .messages {
+    width: 100%;
+    max-height: 100%;
+    flex: 1 1 auto;
+    padding: 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
+    scroll-behavior: smooth;
+    padding-top: 0.5rem;
+    padding-bottom: 2rem;
+}
+
+/* Message bubble base */
+.message {
+    display: inline-block;
+    max-width: min(80%, 560px);
+    padding: 10px 12px;
+    border-radius: var(--radius);
+    position: relative;
+    line-height: 1.25;
+    font-size: 15px;
+    word-wrap: break-word;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02) inset;
+    -webkit-user-select: text;
+    user-select: text;
+    touch-action: manipulation;
+}
+
+/* Received messages (left) */
+.message.received {
+    align-self: flex-start;
+    background: var(--received-bg);
+    color: var(--text-received);
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    border-bottom-left-radius: 0;
+    margin-right: auto;
+}
+
+/* Sent messages (right) */
+.message.sent {
+    align-self: flex-end;
+    background: var(--sent-bg);
+    color: var(--sent-text);
+    border-top-right-radius: 15px;
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 0;
+    margin-left: auto;
+}
+
+/* Message "tail" using pseudo-elements */
+/*
+.message.received::after,
+.message.sent::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    bottom: 6px;
+    transform: rotate(45deg);
+    z-index: 1;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02) inset;
+}
+.message.received::after {
+    left: -6px;
+    background: var(--received-bg);
+    border-bottom-left-radius: 2px;
+}
+
+.message.sent::after {
+    right: -6px;
+    bottom: -2px;
+    background: var(--sent-bg);
+    border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
+}
+*/
+/* Timestamp styling */
+.message-time {
+    display: block;
+    font-size: 11px;
+    color: rgba(0, 0, 0, 0.45);
+    margin-top: 6px;
+    text-align: right;
+    opacity: 0.9;
+}
+
+/* Make timestamps lighter on sent bubbles */
+.message.sent .message-time {
+    color: rgba(255, 255, 255, 0.85);
+    opacity: 0.85;
+}
+
+/* Small touch-target spacing for mobile */
+.message {
+    padding: 12px 14px;
+    min-width: 48px;
+}
+.message .media-img {
+    width: 100%;
+    display: flex;
+}
+.media-img img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+/* Accessibility: contrast fallback for dark text on light bg */
+@media (prefers-contrast: high) {
+    .message.received {
+        color: #111;
+    }
+}
+
+/* Scrollbar styling (WebKit) */
+.messages::-webkit-scrollbar {
+    width: 10px;
+}
+.messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+.messages::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 99px;
+}
+
+/* If you later add an input area, leave room for safe-area bottom */
+.chatbox + .chat-input-safe-space {
+    height: calc(var(--safe-bottom) + 12px);
+}
+
+/* Utility: small metadata/typing indicator */
+.typing {
+    font-size: 13px;
+    color: var(--muted);
+    display: block;
+    padding-left: 4px;
+}
+
+/* Optional: subtle animation for new messages */
+@keyframes popIn {
+    from {
+        transform: translateY(6px) scale(0.995);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+.message {
+    animation: popIn 160ms ease;
 }
 
 /*---> Mobile Responsive <---*/
@@ -223,7 +482,9 @@ body {
         height: 100vh;
     }
     .header,
+    .chat-header,
     .chatbox,
+    .home-page,
     .footer {
         width: 100%;
         left: 0;
@@ -233,16 +494,17 @@ body {
     }
     /* default on mobile: sidebar should be hidden until toggled */
     .sidebar {
-        width: 0;
+        width: -100%;
         left: -100%;
         transition: all 0.25s ease;
+        z-index: 90;
     }
     /* When toggled on mobile, sidebar slides over the content */
     .active-menu {
-        width: 80%;
+        width: 100%;
         left: 0;
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-        z-index: 90;
+        z-index: 900;
     }
     /* make label/menu button more visible */
     .menu-btn {

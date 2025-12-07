@@ -1,9 +1,13 @@
-import React from 'react'
+import React, { useEffect, useState } from "react";
 
 const Home = () => {
-  return (
-    <div>Home Page</div>
-  )
-}
+    
 
-export default Home
+    return (
+        <content className="home-page">
+            <h2>Home Page</h2>
+        </content>
+    );
+};
+
+export default Home;

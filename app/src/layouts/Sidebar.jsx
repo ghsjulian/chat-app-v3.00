@@ -1,15 +1,19 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import { IoSearchOutline } from "react-icons/io5";
 import { IoSettingsOutline } from "react-icons/io5";
-import useApp from "../store/useApp"
-
+import useApp from "../store/useApp";
+import User from "../components/User";
 
 const Sidebar = () => {
-    const {isMenuActive} = useApp()
-    
+    const { isMenuActive, setPath,path } = useApp();
+    const location = useLocation();
+    useEffect(() => {
+        setPath(location.pathname);
+    }, [location]);
+
     return (
-        <aside className={isMenuActive ? "sidebar active-menu" : "sidebar"}>
+        <aside className={path === "/" ? "sidebar active-menu" : "sidebar"}>
             <div className="side-top">
                 <div className="heading">
                     <h3>Chats</h3>
@@ -23,126 +27,9 @@ const Sidebar = () => {
                 </div>
             </div>
             <div className="users-list">
-                <NavLink className="" to="#">
-                    <div className="left">
-                        <img src="./ghs.png" />
-                        <div className="name">
-                            <span>Ghs Julian</span>
-                            <p>This is a test message</p>
-                        </div>
-                    </div>
-                    <div className="right">
-                        <time>12:45 PM</time>
-                    </div>
-                </NavLink>
-                <NavLink to="#">
-                    <div className="left">
-                        <img src="./ghs.png" />
-                        <div className="name">
-                            <span>Ghs Julian</span>
-                            <p>This is a test message</p>
-                        </div>
-                    </div>
-                    <div className="right">
-                        <time>12:45 PM</time>
-                    </div>
-                </NavLink>
-                <NavLink to="#">
-                    <div className="left">
-                        <img src="./ghs.png" />
-                        <div className="name">
-                            <span>Ghs Julian</span>
-                            <p>This is a test message</p>
-                        </div>
-                    </div>
-                    <div className="right">
-                        <time>12:45 PM</time>
-                    </div>
-                </NavLink>
-                <NavLink to="#">
-                    <div className="left">
-                        <img src="./ghs.png" />
-                        <div className="name">
-                            <span>Ghs Julian</span>
-                            <p>This is a test message</p>
-                        </div>
-                    </div>
-                    <div className="right">
-                        <time>12:45 PM</time>
-                    </div>
-                </NavLink>
-                <NavLink to="#">
-                    <div className="left">
-                        <img src="./ghs.png" />
-                        <div className="name">
-                            <span>Ghs Julian</span>
-                            <p>This is a test message</p>
-                        </div>
-                    </div>
-                    <div className="right">
-                        <time>12:45 PM</time>
-                    </div>
-                </NavLink>
-                <NavLink to="#">
-                    <div className="left">
-                        <img src="./ghs.png" />
-                        <div className="name">
-                            <span>Ghs Julian</span>
-                            <p>This is a test message</p>
-                        </div>
-                    </div>
-                    <div className="right">
-                        <time>12:45 PM</time>
-                    </div>
-                </NavLink>
-                <NavLink to="#">
-                    <div className="left">
-                        <img src="./ghs.png" />
-                        <div className="name">
-                            <span>Ghs Julian</span>
-                            <p>This is a test message</p>
-                        </div>
-                    </div>
-                    <div className="right">
-                        <time>12:45 PM</time>
-                    </div>
-                </NavLink>
-                <NavLink to="#">
-                    <div className="left">
-                        <img src="./ghs.png" />
-                        <div className="name">
-                            <span>Ghs Julian</span>
-                            <p>This is a test message</p>
-                        </div>
-                    </div>
-                    <div className="right">
-                        <time>12:45 PM</time>
-                    </div>
-                </NavLink>
-                <NavLink to="#">
-                    <div className="left">
-                        <img src="./ghs.png" />
-                        <div className="name">
-                            <span>Ghs Julian</span>
-                            <p>This is a test message</p>
-                        </div>
-                    </div>
-                    <div className="right">
-                        <time>12:45 PM</time>
-                    </div>
-                </NavLink>
-                <NavLink to="#">
-                    <div className="left">
-                        <img src="./ghs.png" />
-                        <div className="name">
-                            <span>Ghs Julian</span>
-                            <p>This is a test message</p>
-                        </div>
-                    </div>
-                    <div className="right">
-                        <time>12:45 PM</time>
-                    </div>
-                </NavLink>
+                {/*Here I will apply the logic,
+                like render the users and search users also */}
+                <User />
             </div>
         </aside>
     );
