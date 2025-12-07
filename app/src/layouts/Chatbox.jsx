@@ -6,9 +6,7 @@ const Chatbox = () => {
         <content className="chatbox">
             <div className="messages">
                 <MessageBubble />
-                <div className="media-img">
-                <img src="/img.jpg"/>
-                </div>
+                
             </div>
         </content>
     );
