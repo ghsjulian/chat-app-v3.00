@@ -1,0 +1,30 @@
+{
+    "name": "chat-server",
+    "version": "1.0.0",
+    "description": "Chat Application Version 3.00",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "server": "nodemon server.js"
+    },
+    "dependencies": {
+        "axios": "^1.12.2",
+        "bcryptjs": "^3.0.2",
+        "body-parser": "^2.2.0",
+        "cloudinary": "^2.7.0",
+        "cookie-parser": "^1.4.7",
+        "cors": "^2.8.5",
+        "dotenv": "^17.2.2",
+        "express": "^5.1.0",
+        "jsonwebtoken": "^9.0.2",
+        "mongoose": "^8.18.2",
+        "nodemailer": "^7.0.9"
+    },
+    "keywords": ["chat app","messanger"],
+    "author": "ghsjulian@outlook.com",
+    "license": "ISC",
+    "type": "commonjs",
+    "devDependencies": {
+        "nodemon": "^3.1.10"
+    }
+}
