@@ -1,0 +1,171 @@
+.full-page {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--app-bg);
+}
+.form {
+    width: 300px;
+    position: relative;
+    background: #ffff;
+    overflow: hidden;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+}
+.form h3 {
+    color: #1c87ff;
+    font-weight: 700;
+    text-align: center;
+}
+.form .user-avatar {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0.3rem auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    border-width: 1px;
+    border-style: dashed;
+    border-color: #25393d;
+}
+.user-avatar label {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-width: 1px;
+    border-style: dashed;
+    border-color: #0c00f6;
+    background: #ffffff;
+    z-index: 10;
+    cursor: pointer;
+}
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+.form input,
+button,
+p {
+    outline: none;
+    background: transparent;
+    width: 90%;
+    padding: 0.6rem 1rem;
+    margin: 0.5rem auto;
+}
+.form #info {
+    color: #304551;
+    text-align: justify;
+    line-height: 1.3rem;
+}
+.form input,
+button {
+    border-style: dashed;
+    border-width: 1.5px;
+    border-color: #151a1f;
+    color: #151a1f;
+    font-weight: 700;
+    border-radius: 3px;
+}
+.form input:focus {
+    border-color: #01a400;
+}
+.form span {
+    width: 90%;
+    font-size: 12.5px;
+    text-align: center;
+    transition: 0.3s ease-in;
+    animation: zoom 0.3s linear;
+}
+.form .error {
+    background: rgba(222, 36, 0, 0.157);
+    color: rgb(186, 30, 0);
+    padding: 0.5rem;
+    border-radius: 3px;
+    margin: 0.3rem auto;
+    font-weight: 600;
+    border-width: 1px;
+    border-style: dashed;
+    border-color: rgb(186, 30, 0);
+}
+.form .success {
+    background: rgba(5, 222, 0, 0.157);
+    color: rgb(23, 186, 0);
+    padding: 0.5rem;
+    border-radius: 3px;
+    margin: 0.3rem auto;
+    font-weight: 600;
+    border-width: 1px;
+    border-style: dashed;
+    border-color: rgb(23, 186, 0);
+}
+.form p {
+    font-size: 12.5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.form p a {
+    text-decoration: none;
+    outline: none;
+    cursor: pointer;
+    color: #0065de;
+    font-weight: 900;
+    font-size: 13px;
+}
+.form button {
+    background: #151a1f;
+    color: #fff;
+    font-weight: 900;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.form button .loader {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: transparent;
+    border-left: 2.5px solid transparent;
+    border-right: 2.5px solid currentColor;
+    border-top: 2.5px solid currentColor;
+    border-bottom: 2.5px solid currentColor;
+    margin: 0 0.3rem;
+    animation: spinner 0.7s linear infinite;
+}
+
+@keyframes zoom {
+    from {
+        transform: scale(0);
+    }
+    to {
+        transform: scale(1, 1);
+    }
+}
+@keyframes spinner {
+    from {
+        border-bottom: 2.5px solid #1dffd5;
+        transform: rotate(0deg);
+        opacity: 0.7;
+    }
+    to {
+        transform: rotate(360deg);
+        border-bottom: 2.5px solid currentColor;
+        opacity: 1;
+    }
+}

@@ -6,7 +6,7 @@
 
 const { Server } = require("socket.io");
 
-module.exports = function createSocket(server, config, logger) {
+module.exports = function createSocket(server, config) {
   const io = new Server(server, {
     path: "/socket.io",
     cors: {
@@ -23,23 +23,23 @@ module.exports = function createSocket(server, config, logger) {
         socket.handshake.auth?.token || socket.handshake.query?.token;
       socket.user = token ? { id: token } : null;
       return next();
-    } catch (err) {
-      logger.warn("Socket auth failed", { err });
+    } catch (error) {
+      console.log("\n[!] Socket auth failed", { error });
       return next(new Error("Authentication error"));
     }
   });
 
   io.on("connection", (socket) => {
-    logger.info("Socket connected", { id: socket.id, user: socket.user });
+    console.log("\n[+] Socket connected", { id: socket.id, user: socket.user });
 
     socket.on("joinRoom", (room, cb) => {
       try {
         if (!room) return cb?.({ ok: false, error: "Room required" });
         socket.join(room);
-        logger.info("Socket joined room", { socketId: socket.id, room });
+        console.log("Socket joined room", { socketId: socket.id, room });
         cb?.({ ok: true });
       } catch (err) {
-        logger.warn("joinRoom error", { err });
+        console.log("joinRoom error", { err });
         cb?.({ ok: false, error: err.message });
       }
     });
@@ -52,13 +52,13 @@ module.exports = function createSocket(server, config, logger) {
         socket.to(room).emit("roomMessage", out);
         cb?.({ ok: true });
       } catch (err) {
-        logger.warn("roomMessage error", { err });
+        console.log("roomMessage error", { err });
         cb?.({ ok: false, error: err.message });
       }
     });
     // ping/pong or heartbeat can be handled by socket.io itself
     socket.on("disconnect", (reason) => {
-      logger.info("Socket disconnected", { id: socket.id, reason });
+      console.log("Socket disconnected", { id: socket.id, reason });
     });
   });
   return io;

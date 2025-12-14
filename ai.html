@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gesture-Controlled 3D Particle System // CYBER-OPS</title>
+    
+    <style>
+        /* Import a technical/monospace font for the cyber feel */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+        
+        :root {
+            --neon-blue: #00ffff;
+            --neon-magenta: #ff00ff;
+            --dark-bg: #03001C;
+            --mid-bg: #0A0434;
+            --border-glow: 0 0 5px var(--neon-blue), 0 0 10px var(--neon-magenta);
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: var(--dark-bg);
+            font-family: 'Roboto Mono', monospace; /* Futuristic Font */
+            color: var(--neon-blue);
+        }
+        
+        canvas {
+            display: block;
+        }
+        
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 20px;
+            background: var(--mid-bg);
+            border: 2px solid var(--neon-blue);
+            /* Corner clipping effect */
+            clip-path: polygon(0% 10px, 10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%);
+            /* Outer glow */
+            box-shadow: var(--border-glow);
+            z-index: 10;
+            transition: all 0.3s ease-in-out;
+        }
+        
+        #info:hover {
+            border-color: var(--neon-magenta);
+            box-shadow: 0 0 8px var(--neon-magenta), 0 0 15px var(--neon-blue);
+        }
+
+        #info h1 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.4em;
+            color: var(--neon-magenta);
+            text-shadow: 0 0 5px var(--neon-magenta);
+            border-bottom: 1px solid var(--neon-blue);
+            padding-bottom: 5px;
+        }
+
+        #info p {
+            font-size: 0.8em;
+            color: #88ffff;
+            margin-top: 5px;
+            margin-bottom: 15px;
+        }
+
+        #info ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+        }
+        
+        #info ul li {
+            font-size: 0.8em;
+            margin-bottom: 8px;
+            /* Small arrow prefix */
+            padding-left: 15px;
+            position: relative;
+        }
+        
+        #info ul li::before {
+            content: "// >"; 
+            position: absolute;
+            left: 0;
+            color: var(--neon-blue);
+            text-shadow: 0 0 3px var(--neon-blue);
+        }
+        
+        #info ul li strong {
+            color: var(--neon-magenta);
+        }
+        
+        /* Style for the video element placeholder (invisible) */
+        #video {
+            border: 1px solid rgba(0, 255, 255, 0.2); /* Subtle wireframe look */
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h1>// SYSTEM_INIT: PARTICLE_GRID</h1>
+        <p>[0x1A4F] Hand Tracking Interface Active. Awaiting Gestural Input...</p>
+        <ul>
+            <li>**TEMPLATE_SELECT [1]:** Cloud_DEFAULT</li>
+            <li>**TEMPLATE_SELECT [2]:** Heart_FLORA</li>
+            <li>**TEMPLATE_SELECT [3]:** Firework_BURST</li>
+            <li>**CONTROL [SIZE]:** Hand Spread (Amplitude)</li>
+            <li>**CONTROL [COLOR]:** Vertical Axis (Hue Shift)</li>
+        </ul>
+    </div>
+    
+    <video id="video" playsinline style="display: none;"></video>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <script type="module">
+        // Import Three.js modules (Note: using script type="module" allows imports)
+        import * as THREE from 'https://unpkg.com/three@0.128.0/build/three.module.js';
+
+        let scene, camera, renderer;
+        let particleSystem, geometry, material;
+        const particleCount = 20000;
+        const particles = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+        const sizes = new Float32Array(particleCount);
+
+        // Gesture Control Variables (These would be updated by your hand tracker)
+        const controls = {
+            template: 1, // 1: Default Cloud, 2: Heart/Flower, 3: Firework
+            expandFactor: 1.0, // Controls particle spread/size (from hand distance)
+            colorHue: 0.5,      // Controls color (from hand Y-position)
+            switchDelay: 0,    // Cooldown for template switching
+            fireworkTrigger: false, // Firework explosion trigger
+        };
+
+        // --- PARTICLE TEMPLATE DEFINITIONS ---
+
+        /** Generates initial positions for a simple 3D cloud. */
+        function createCloudTemplate() {
+            const spread = 200;
+            for (let i = 0; i < particleCount; i++) {
+                particles[i * 3 + 0] = (Math.random() - 0.5) * spread;
+                particles[i * 3 + 1] = (Math.random() - 0.5) * spread;
+                particles[i * 3 + 2] = (Math.random() - 0.5) * spread;
+
+                // Slightly tinted initial color for cyber feel
+                colors[i * 3 + 0] = 0.8; 
+                colors[i * 3 + 1] = 0.9;
+                colors[i * 3 + 2] = 1.0;
+
+                sizes[i] = Math.random() * 5 + 2;
+            }
+        }
+
+        /** Generates initial positions for a heart or flower-like shape. */
+        function createHeartTemplate() {
+            const scale = 50;
+            for (let i = 0; i < particleCount; i++) {
+                const t = Math.random() * 2 * Math.PI; 
+                const r = Math.random() * scale * 0.5; 
+                const z = (Math.random() - 0.5) * 50; 
+
+                // Heart shape X and Y
+                particles[i * 3 + 0] = r * 16 * Math.pow(Math.sin(t), 3) / 8 + (Math.random() - 0.5) * 5;
+                particles[i * 3 + 1] = r * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) / 8 + (Math.random() - 0.5) * 5;
+                particles[i * 3 + 2] = z;
+
+                // Cyber Magenta/Purple base color
+                colors[i * 3 + 0] = 1.0;
+                colors[i * 3 + 1] = 0.3 + Math.random() * 0.2;
+                colors[i * 3 + 2] = 1.0;
+
+                sizes[i] = Math.random() * 7 + 3;
+            }
+        }
+
+        /** Generates initial positions for a firework-like sphere explosion. */
+        function createFireworkTemplate() {
+            const radius = 100;
+            const center = new THREE.Vector3(0, 0, 0);
+
+            for (let i = 0; i < particleCount; i++) {
+                // Sphere distribution
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(Math.random() * 2 - 1);
+                const r = Math.random() * radius;
+
+                particles[i * 3 + 0] = center.x + r * Math.sin(phi) * Math.cos(theta);
+                particles[i * 3 + 1] = center.y + r * Math.sin(phi) * Math.sin(theta);
+                particles[i * 3 + 2] = center.z + r * Math.cos(phi);
+
+                // Bright, high-contrast colors
+                colors[i * 3 + 0] = Math.random() > 0.5 ? 1.0 : 0.0;
+                colors[i * 3 + 1] = Math.random();
+                colors[i * 3 + 2] = Math.random() > 0.5 ? 1.0 : 0.0;
+
+                sizes[i] = Math.random() * 10 + 5;
+            }
+        }
+
+        // --- INITIALIZATION ---
+
+        function init() {
+            // Scene Setup
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 300;
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            // Particle System Setup (Attributes)
+            geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(particles, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+            // Particle Material (slightly adjusted opacity for neon look)
+            material = new THREE.PointsMaterial({
+                size: 10,
+                vertexColors: true,
+                sizeAttenuation: true,
+                transparent: true,
+                opacity: 0.95,
+            });
+            
+            // Create the initial template
+            createCloudTemplate(); 
+            geometry.attributes.position.needsUpdate = true;
+            geometry.attributes.color.needsUpdate = true;
+
+            particleSystem = new THREE.Points(geometry, material);
+            scene.add(particleSystem);
+
+            window.addEventListener('resize', onWindowResize, false);
+            
+            // Start the video stream
+            const video = document.getElementById('video');
+            navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+                video.srcObject = stream;
+                video.play();
+            });
+
+            animate();
+        }
+
+        // --- GESTURE CONTROL LOGIC ---
+
+        /** Updates the size and color attributes based on gesture controls. */
+        function updateParticleAttributes() {
+            const positionAttribute = geometry.attributes.position;
+            const colorAttribute = geometry.attributes.color;
+            const sizeAttribute = geometry.attributes.size;
+            
+            const baseColor = new THREE.Color();
+
+            for (let i = 0; i < particleCount; i++) {
+                // 1. DYNAMIC COLOR CHANGE (Controlled by controls.colorHue)
+                // Use HSL for smooth, colorful transitions
+                baseColor.setHSL((controls.colorHue + i * 0.0001) % 1.0, 1.0, 0.6); // Saturation high for neon
+                
+                colorAttribute.array[i * 3 + 0] = baseColor.r;
+                colorAttribute.array[i * 3 + 1] = baseColor.g;
+                colorAttribute.array[i * 3 + 2] = baseColor.b;
+                
+                // 2. DYNAMIC SIZE/EXPANSION CHANGE (Controlled by controls.expandFactor)
+                sizeAttribute.array[i] = sizes[i] * (0.5 + controls.expandFactor * 1.5);
+
+                // Optional: Update position slightly for movement effect (swirling)
+                positionAttribute.array[i * 3 + 0] += Math.sin(Date.now() * 0.001 + i) * 0.05;
+                positionAttribute.array[i * 3 + 1] += Math.cos(Date.now() * 0.001 + i) * 0.05;
+            }
+
+            colorAttribute.needsUpdate = true;
+            sizeAttribute.needsUpdate = true;
+            positionAttribute.needsUpdate = true;
+        }
+
+        /** Switches the particle template and resets positions/colors. */
+        function switchTemplate(newTemplate) {
+            if (controls.switchDelay > 0) return; 
+
+            controls.template = newTemplate;
+            
+            switch (newTemplate) {
+                case 1:
+                    createCloudTemplate();
+                    break;
+                case 2:
+                    createHeartTemplate();
+                    break;
+                case 3:
+                    createFireworkTemplate();
+                    break;
+                default:
+                    createCloudTemplate();
+                    break;
+            }
+            
+            geometry.attributes.position.needsUpdate = true;
+            geometry.attributes.color.needsUpdate = true;
+            
+            controls.switchDelay = 60; 
+            console.log(`Template switched to ${newTemplate}`);
+            
+            // Optional: Update UI to show current template (Placeholder)
+            const templateText = document.querySelector(`#info ul li:nth-child(${newTemplate})`);
+            if (templateText) {
+                document.querySelectorAll('#info ul li').forEach(li => li.style.color = 'var(--neon-blue)');
+                templateText.style.color = 'var(--neon-magenta)';
+            }
+        }
+
+        // --- MAIN ANIMATION LOOP ---
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Camera orbit
+            const time = Date.now() * 0.0005;
+            camera.position.x = Math.cos(time) * 300;
+            camera.position.z = Math.sin(time) * 300;
+            camera.lookAt(scene.position);
+            
+            // Decrement switch cooldown
+            if (controls.switchDelay > 0) {
+                controls.switchDelay--;
+            }
+
+            updateParticleAttributes();
+            
+            // --- GESTURE EMULATION / TESTING (REPLACE THIS BLOCK FOR LIVE HAND TRACKING) ---
+            controls.expandFactor = Math.sin(Date.now() * 0.001) * 0.5 + 1.0;
+            controls.colorHue = (Date.now() * 0.00005) % 1.0;
+            
+            // Auto-switch template every 5 seconds for demo
+            if (Math.floor(Date.now() / 5000) % 3 !== controls.template - 1) {
+                switchTemplate((Math.floor(Date.now() / 5000) % 3) + 1);
+            }
+            // --- END GESTURE EMULATION ---
+
+            renderer.render(scene, camera);
+        }
+
+        // --- WINDOW RESIZE HANDLER ---
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // --- START THE APPLICATION ---
+        init();
+    </script>
+</body>
+</html>

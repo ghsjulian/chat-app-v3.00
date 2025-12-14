@@ -5,76 +5,131 @@ import useMessage from "../store/useMessage";
 import isValid from "../libs/is-valid-text";
 
 const Footer = () => {
-  const { sendMessage } = useMessage();
-  const [text, setText] = useState("");
-  const [file, setFile] = useState(null);
-  const [totalFiles, setFiles] = useState([]);
-  const inputRef = useRef(null);
+    const { sendMessage } = useMessage();
+    const [text, setText] = useState("");
+    const [files, setFiles] = useState([]); // flat array of File objects
+    const textRef = useRef(null);
+    const fileInputRef = useRef(null);
+    const MAX_FILES = 6;
 
-  const handleFiles = (e) => {
-    let files = e.target.files;
-    if (!files || files?.length === 0) return;
-    if (files.length >= 6 && totalFiles.length >= 6)
-      throw new Error("Max file size 6");
-    if (files.length > 0) {
-      // setFormData((prev) => ({ ...prev, [id]: value }));
-      // setFiles(Array.from(files));
-      setFiles((prev) => [...prev, Array.from(files)]);
-      console.log(totalFiles);
-    }
-  };
+    // Helper: avoid duplicates by name + size
+    const mergeFiles = (existing, incoming) => {
+        const existingKeys = new Set(existing.map(f => `${f.name}-${f.size}`));
+        const filteredIncoming = incoming.filter(
+            f => !existingKeys.has(`${f.name}-${f.size}`)
+        );
+        return [...existing, ...filteredIncoming];
+    };
 
-  return (
-    <footer className="footer">
-      {totalFiles && totalFiles?.length > 0 && (
-        <div className="selected-media">
-          {totalFiles?.map((file) => {
-            return (
-              <div className="img">
-                <button className="close">x</button>
-                <div className="av">{file.type.split("/")[1]}</div>
-              </div>
+    const handleFiles = e => {
+        const fl = e.target.files;
+        if (!fl || fl.length === 0) return;
+
+        const incoming = Array.from(fl);
+
+        // Merge while preventing duplicates
+        let merged = mergeFiles(files, incoming);
+
+        // Enforce max limit
+        if (merged.length > MAX_FILES) {
+            merged = merged.slice(0, MAX_FILES);
+            // optional: inform user they hit limit
+            // alert(`Maximum ${MAX_FILES} files allowed`);
+            console.warn(
+                `Maximum ${MAX_FILES} files allowed — extras were ignored.`
             );
-          })}
-        </div>
-      )}
-      <div className="input-wrapper">
-        <label htmlFor="files">
-          <GrAttachment size={24} />
-        </label>
-        <input
-          onChange={handleFiles}
-          type="file"
-          id="files"
-          multiple={true}
-          hidden={true}
-        />
-        <input
-          ref={inputRef}
-          onKeyDown={(e) => {
-            if (e.keyCode === 13) {
-              if (!isValid(text)) return;
-              sendMessage({ text, files: totalFiles ?? null });
-              inputRef.current.focus();
-            }
-            return;
-          }}
-          onChange={(e) => setText(e.target.value)}
-          value={text}
-          type="text"
-          className="message-input"
-          placeholder="Aa"
-        />
-        <MdSend
-          onClick={() => {
-            if (!isValid(text)) return;
-            sendMessage({ text, files: totalFiles ?? null });
-          }}
-          size={24}
-        />
-      </div>
-    </footer>
-  );
+        }
+
+        setFiles(merged);
+
+        // Reset file input so selecting the same file again will trigger onChange
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    };
+
+    const removeFileAt = index => {
+        setFiles(prev => {
+            const next = [...prev];
+            next.splice(index, 1);
+            return next;
+        });
+    };
+
+    const handleSend = () => {
+        if (!isValid(text) && files.length === 0) return;
+        // send Message object containing text and files array (or null)
+        sendMessage({
+            text: isValid(text) ? text : "",
+            files: files.length ? files : null
+        });
+        setText("");
+        setFiles([]);
+        if (textRef.current) textRef.current.focus();
+    };
+
+    return (
+        <footer className="footer">
+            {files.length > 0 && (
+                <div className="selected-media">
+                    {files.map((f, idx) => {
+                        const ext = f.type
+                            ? f.type.split("/")[1]
+                            : f.name.split(".").pop();
+                        return (
+                            <div className="img" key={`${f.name}-${f.size}`}>
+                                <button
+                                    className="close"
+                                    onClick={() => removeFileAt(idx)}
+                                    type="button"
+                                    aria-label={`Remove ${f.name}`}
+                                >
+                                    &times;
+                                </button>
+                                <div className="av">{ext}</div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+
+            <div className="input-wrapper">
+                <label htmlFor="files">
+                    <GrAttachment size={24} />
+                </label>
+
+                <input
+                    ref={fileInputRef}
+                    onChange={handleFiles}
+                    type="file"
+                    id="files"
+                    multiple={true}
+                    hidden={true}
+                />
+
+                <input
+                    ref={textRef}
+                    onKeyDown={e => {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+                            handleSend();
+                        }
+                    }}
+                    onChange={e => setText(e.target.value)}
+                    value={text}
+                    type="text"
+                    className="message-input"
+                    placeholder="Aa"
+                />
+
+                <MdSend
+                    onClick={handleSend}
+                    size={24}
+                    style={{ cursor: "pointer" }}
+                />
+            </div>
+        </footer>
+    );
 };
 
 export default Footer;
