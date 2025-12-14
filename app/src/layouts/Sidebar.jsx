@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation,useNavigate } from "react-router-dom";
 import { IoSearchOutline } from "react-icons/io5";
 import { IoSettingsOutline } from "react-icons/io5";
 import useApp from "../store/useApp";
@@ -8,6 +8,7 @@ import User from "../components/User";
 const Sidebar = () => {
     const { isMenuActive, setPath,path } = useApp();
     const location = useLocation();
+    const navigate = useNavigate()
     useEffect(() => {
         setPath(location.pathname);
     }, [location]);
@@ -17,7 +18,7 @@ const Sidebar = () => {
             <div className="side-top">
                 <div className="heading">
                     <h3>Chats</h3>
-                    <div className="icon">
+                    <div onClick={()=>navigate("/settings")} className="icon">
                         <IoSettingsOutline size={24} />
                     </div>
                 </div>

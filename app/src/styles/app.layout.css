@@ -197,10 +197,24 @@ body {
         width 0.3s ease;
     overflow: auto;
 }
-.settings h3 {
+.settings .settings-head {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.7rem 1.3rem;
+    background: var(--app-container);
+    border-bottom: 1px solid var(--text);
+    z-index: 90;
+}
+.settings .settings-head h3 {
     color: var(--blue);
-    text-align: center;
-    margin: 0.5rem auto;
+}
+.settings-head #back {
+    display: none;
+    cursor: pointer;
 }
 .settings .area {
     width: 100%;
@@ -208,6 +222,8 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    margin: 1rem auto;
+    padding: 1.5rem 0;
 }
 .settings .area #p-info {
     width: 100%;
@@ -237,6 +253,8 @@ body {
 }
 .row .profile-img label {
     position: absolute;
+    width: 60px;
+    height: 25px;
     bottom: 0;
     left: 0;
     right: 0;
@@ -244,6 +262,8 @@ body {
     color: #fff;
     font-size: 13px;
     cursor: pointer;
+    z-index: 5;
+    text-align: center;
 }
 .settings .area .row select {
     outline: none;
@@ -255,6 +275,10 @@ body {
     font-weight: 500;
     border-radius: 5px;
     padding: 0.5rem 0.7rem;
+}
+.area .row p {
+    width: 80%;
+    margin: 0.7rem 0;
 }
 .settings .area .row input {
     width: 90%;
@@ -272,9 +296,50 @@ body {
     outline: none;
     border: none;
     background: transparent;
+    margin: 0 0;
 }
 .settings .area .row #logout-btn {
     background: #c82900;
+    color: #fff;
+    font-weight: 600;
+    padding: 0.5rem 0.4rem;
+    border-radius: 5px;
+}
+.settings .area .row .info-btn {
+    background: #006ec8;
+    color: #fff;
+    font-weight: 600;
+    padding: 0.5rem 0.4rem;
+    border-radius: 5px;
+}
+.settings .area .row .save-btn {
+    width: 200px;
+    background: #00830d;
+    color: #fff;
+    font-weight: 600;
+    padding: 0.5rem 0.4rem;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.save-btn .loader {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: transparent;
+    border-left: 2.5px solid transparent;
+    border-right: 2.5px solid currentColor;
+    border-top: 2.5px solid currentColor;
+    border-bottom: 2.5px solid currentColor;
+    margin: 0 0.3rem;
+    animation: spinner 0.7s linear infinite;
+}
+.area .row #info {
+    color: var(--blue);
+}
+.settings .area .row .reset-btn {
+    background: #0f1318;
     color: #fff;
     font-weight: 600;
     padding: 0.5rem 0.4rem;
@@ -444,20 +509,22 @@ body {
     background: var(--online);
     border: 1px solid #ffffff;
 }
-.users-list a .left .name {
+.users-list a .left .u-name {
+    width: 90%;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: left;
     align-items: left;
-    gap: 4px;
-    margin-left: 2px;
+    text-align: justify;
 }
-.left .name span {
+.left .u-name strong {
     color: var(--blue);
     font-weight: 700;
     font-size: 17px;
+    margin-top: 20px;
+    margin-left: 10px;
 }
-.left .name p {
+.left .u-name p {
     color: var(--unread-msg);
     font-weight: 500;
     font-size: 15px;
@@ -665,11 +732,20 @@ body {
     .chatbox,
     .home-page,
     .settings,
+    .settings-head,
     .footer {
         width: 100%;
         left: 0;
     }
+    .settings .settings-head {
+        position: fixed;
+        left: 0;
+        width: 100%;
+    }
     #menu {
+        display: block;
+    }
+    .settings-head #back {
         display: block;
     }
     /* default on mobile: sidebar should be hidden until toggled */
