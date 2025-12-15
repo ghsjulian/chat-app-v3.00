@@ -50,7 +50,8 @@ const App = () => {
                 />
                 <Route
                     path="/reset-password"
-                    element={ <ResetPassword />
+                    element={!user ?
+                        <Navigate to="/login" /> : <ResetPassword />
                     }
                 />
             </Routes>

@@ -45,7 +45,7 @@ const Settings = () => {
             msgRef.current.textContent = msg;
             msgRef.current.classList.add("error");
         }
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        msgRef.current.click()
         setTimeout(() => {
             msgRef.current.textContent = "";
             msgRef.current.removeAttribute("class");
@@ -99,6 +99,7 @@ const Settings = () => {
 
     const handleSave = async () => {
         if (!checkValidation()) return;
+        window.scrollTo({ top: 0, behavior: "smooth" });
         await saveSettings(userInfo, showMessage, navigate);
     };
 
@@ -113,6 +114,16 @@ const Settings = () => {
             <div className="area">
                 <span ref={msgRef} id="msg"></span>
                 <p id="p-info">Account Information</p>
+                <div className="row">
+                    <p>Account Verification S.</p>
+                    <button
+                        className={
+                            user?.isVerified ? "verified" : "not-verified"
+                        }
+                    >
+                        {user?.isVerified ? "Verified" : "Not Verified"}
+                    </button>
+                </div>
                 <div className="row">
                     <p>Your Profile Image</p>
                     <div className="profile-img">
@@ -200,8 +211,8 @@ const Settings = () => {
                             <p id="info">Forgot Password ? </p>
                             <button
                                 disabled={isResending}
-                                onClick={async(e) => {
-                                   await resendOtp(showMessage);
+                                onClick={async e => {
+                                    await resendOtp(showMessage);
                                     setTimeout(() => {
                                         navigate("/verify-otp");
                                     }, 2000);

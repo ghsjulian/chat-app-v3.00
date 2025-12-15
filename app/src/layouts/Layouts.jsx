@@ -5,10 +5,12 @@ import ChatHeader from "./ChatHeader";
 import Chatbox from "./Chatbox";
 import Footer from "./Footer";
 import "../styles/app.layout.css";
+import useApp from "../store/useApp"
 
 const Layouts = () => {
+    const {chatSettings} = useApp()
     return (
-        <main className="main-container">
+        <main className={`main-container ${chatSettings.appTheme}`}>
             <Sidebar />
             {/*-->Add a condition,
             if selected user then 

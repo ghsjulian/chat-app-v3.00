@@ -24,7 +24,6 @@ const useApp = create((set, get) => ({
                 newPassword: data.newPassword || ""
             };
             const response = await axios.put("/auth/save-settings", info);
-            console.log(response.data);
             if (response?.data?.success) {
                 localStorage.setItem(
                     "chat-settings",
