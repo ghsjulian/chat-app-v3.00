@@ -47,12 +47,13 @@ const VerifyOtp = () => {
                     placeholder="Enter OTP Value"
                 />
                 <button
-                    onClick={() => {
+                    onClick={async() => {
                         if (!otp || otp.trim() === "") {
                             showMessage("OTP is required", false);
                             return;
                         }
-                        verifyOtp(otp, showMessage, navigate);
+                        let isSent = await verifyOtp(otp, showMessage);
+                        if(isSent) navigate("/")
                     }}
                     disabled={isVerifying}
                     className="login-btn"

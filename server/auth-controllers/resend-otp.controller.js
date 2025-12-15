@@ -5,16 +5,9 @@ const genOTP = require("../functions/gen-otp");
 
 const resendOTP = async (req, res) => {
     try {
-        const { email } = req.body;
-        if (!email || email.trim() === "")
-            return res
-                .status(400)
-                .json({ success: false, message: "Email is required" });
-        const user = await userModel.findOne({
-            email: email.trim()
-        });
-        if (!user)
-            return res
+        const user = await userModel.findById(req?.user?._id)
+        if(!user)
+        return res
                 .status(404)
                 .json({ success: false, message: "User not found" });
         if (user.isVerified)

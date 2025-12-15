@@ -2,15 +2,13 @@ const userModel = require("../models/user.model");
 
 const verifyOTP = async (req, res) => {
     try {
-        const { email, otp } = req.body;
+        const {otp } = req.body;
 
-        if (!email || !otp)
+        if ( !otp || otp === "")
             return res
                 .status(400)
-                .json({ success: false, message: "Email and OTP required" });
-        const user = await userModel.findOne({
-            email
-        });
+                .json({ success: false, message: "OTP is required" });
+        const user = await userModel.findById(req?.user?._id)
         if (!user)
             return res
                 .status(404)

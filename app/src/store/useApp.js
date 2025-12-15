@@ -1,29 +1,47 @@
 import { create } from "zustand";
-import axios from "../libs/axios"
-
+import axios from "../libs/axios";
 
 const useApp = create((set, get) => ({
-    isMenuActive : false,
-    isSaving : false,
-    chatSettings : {},
-    path : "",
-    toggleMenu : ()=>{
-        set({isMenuActive : !get().isMenuActive})
+    isMenuActive: false,
+    isSaving: false,
+    chatSettings: JSON.parse(localStorage.getItem("chat-settings")) || null,
+    path: "",
+    toggleMenu: () => {
+        set({ isMenuActive: !get().isMenuActive });
     },
-    setPath : (p)=>{
-        set({path : p})
+    setPath: p => {
+        set({ path: p });
     },
-    saveSettings : async(data,navigate)=>{
+    saveSettings: async (data,showMessage, navigate) => {
         try {
-            set({isSaving:true})
-            console.log(data)
+            set({ isSaving: true });
+            const info = {
+                avatar: data.avatar,
+                name: data.name,
+                email: data.email,
+                isChangingPassword : data.isChangingPassword,
+                oldPassword: data.oldPassword || "",
+                newPassword: data.newPassword || ""
+            };
+            const response = await axios.put("/auth/save-settings", info);
+            console.log(response.data);
+            if (response?.data?.success) {
+                localStorage.setItem(
+                    "chat-settings",
+                    JSON.stringify({
+                        isSound: data.isSound,
+                        appTheme: data.appTheme,
+                        chatTheme: data.chatTheme
+                    })
+                );
+                showMessage(response.data.message, true);
+            }
         } catch (error) {
-            console.log(error.message)
-        }finally{
-            set({isSaving:false})
+            showMessage(error.response.data.message, false);
+        } finally {
+            set({ isSaving: false });
         }
     }
-    
-}))
+}));
 
-export default useApp
+export default useApp;

@@ -1,20 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useApp from "../store/useApp";
+import useAuth from "../store/useAuth";
 
 const Settings = () => {
-    const { isSaving, saveSettings } = useApp();
+    const { user, userLogout, isLogout, resendOtp, isResending } = useAuth();
+    const { chatSettings, isSaving, saveSettings } = useApp();
     const navigate = useNavigate();
+    const msgRef = useRef(null);
     const [isChangingPassword, setChangingPassword] = useState(false);
     const [userInfo, setUserInfo] = useState({
-        avatar: null,
-        name: "",
-        email: "",
+        avatar: user?.avatar?.img_url || null,
+        name: user?.name || "",
+        email: user?.email || "",
         oldPassword: "",
         newPassword: "",
-        isSound: false,
-        appTheme: "white",
-        chatTheme: "white"
+        isChangingPassword,
+        isSound: chatSettings?.isSound,
+        appTheme: chatSettings?.appTheme || "white",
+        chatTheme: chatSettings?.chatTheme || "white"
     });
     const createBase64 = async file => {
         return new Promise((resolve, reject) => {
@@ -33,9 +37,69 @@ const Settings = () => {
             ["avatar"]: base64
         }));
     };
+    const showMessage = (msg, type) => {
+        if (type) {
+            msgRef.current.textContent = msg;
+            msgRef.current.classList.add("success");
+        } else {
+            msgRef.current.textContent = msg;
+            msgRef.current.classList.add("error");
+        }
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setTimeout(() => {
+            msgRef.current.textContent = "";
+            msgRef.current.removeAttribute("class");
+        }, 2500);
+    };
+    const checkValidation = () => {
+        const trimmedName = userInfo?.name?.trim();
+        const trimmedEmail = userInfo?.email?.trim();
+        const trimmedOldPassword = userInfo?.oldPassword?.trim();
+        const trimmedNewPassword = userInfo?.newPassword?.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!userInfo?.avatar || userInfo?.avatar === null) {
+            showMessage("User avatar is required", false);
+            return false;
+        } else if (!trimmedName) {
+            showMessage("User name is required", false);
+            return false;
+        } else if (!trimmedEmail) {
+            showMessage("User email is required", false);
+            return false;
+        } else if (!emailRegex.test(trimmedEmail)) {
+            showMessage("Enter a valid email address", false);
+            return false;
+        }
+        if (isChangingPassword) {
+            if (!trimmedOldPassword) {
+                showMessage("Old password is required", false);
+                return false;
+            } else if (trimmedOldPassword?.length < 6) {
+                showMessage(
+                    "Old password must be at least 6 characters",
+                    false
+                );
+                return false;
+            } else if (!trimmedNewPassword) {
+                showMessage("New password is required", false);
+                return false;
+            } else if (trimmedNewPassword?.length < 6) {
+                showMessage(
+                    "New password must be at least 6 characters",
+                    false
+                );
+                return false;
+            } else if (trimmedNewPassword !== trimmedOldPassword) {
+                showMessage("Old password & new password didn't match", false);
+                return false;
+            }
+        }
+        return true;
+    };
 
     const handleSave = async () => {
-        await saveSettings(userInfo,navigate)
+        if (!checkValidation()) return;
+        await saveSettings(userInfo, showMessage, navigate);
     };
 
     return (
@@ -47,6 +111,7 @@ const Settings = () => {
                 <h3>Chat Settings</h3>
             </div>
             <div className="area">
+                <span ref={msgRef} id="msg"></span>
                 <p id="p-info">Account Information</p>
                 <div className="row">
                     <p>Your Profile Image</p>
@@ -133,7 +198,18 @@ const Settings = () => {
                         </div>
                         <div className="row">
                             <p id="info">Forgot Password ? </p>
-                            <button className="reset-btn">Reset Now</button>
+                            <button
+                                disabled={isResending}
+                                onClick={async(e) => {
+                                   await resendOtp(showMessage);
+                                    setTimeout(() => {
+                                        navigate("/verify-otp");
+                                    }, 2000);
+                                }}
+                                className="reset-btn"
+                            >
+                                {isResending ? "Please Wait..." : "Reset Now"}
+                            </button>
                         </div>
                     </>
                 )}
@@ -142,30 +218,62 @@ const Settings = () => {
                 <div className="row">
                     <p>Notification Sound</p>
                     <div className="box">
-                        <input type="checkbox" />
-                        <span>ON</span>
+                        <input
+                            onChange={e => {
+                                setUserInfo(prev => ({
+                                    ...prev,
+                                    ["isSound"]: !userInfo.isSound
+                                }));
+                            }}
+                            checked={userInfo.isSound}
+                            type="checkbox"
+                        />
+                        <span>{userInfo.isSound ? "ON" : "OFF"}</span>
                     </div>
                 </div>
                 <div className="row">
                     <p> App Theme</p>
-                    <select>
+                    <select
+                        onChange={e => {
+                            setUserInfo(prev => ({
+                                ...prev,
+                                ["appTheme"]: e.target.value
+                            }));
+                        }}
+                        value={userInfo.appTheme}
+                    >
                         <option value="white">White</option>
                         <option value="dark">Dark</option>
                     </select>
                 </div>
                 <div className="row">
                     <p>Chatbox Theme</p>
-                    <select>
+                    <select
+                        onChange={e => {
+                            setUserInfo(prev => ({
+                                ...prev,
+                                ["chatTheme"]: e.target.value
+                            }));
+                        }}
+                        value={userInfo.chatTheme}
+                    >
                         <option value="white">White</option>
                         <option value="dark">Dark</option>
                     </select>
                 </div>
                 <div className="row">
                     <p>Account Controls</p>
-                    <button id="logout-btn">Logout</button>
+                    <button onClick={userLogout} id="logout-btn">
+                        {isLogout && <div className="loader"></div>}
+                        <span>{isLogout ? "Processing..." : "Logout"}</span>
+                    </button>
                 </div>
                 <div className="row">
-                    <button onClick={handleSave} className="save-btn">
+                    <button
+                        disabled={isSaving}
+                        onClick={handleSave}
+                        className="save-btn"
+                    >
                         {isSaving && <div className="loader"></div>}
                         <span>
                             {isSaving ? "Saving..." : "Save Settings & Apply"}

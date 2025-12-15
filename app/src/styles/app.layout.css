@@ -225,6 +225,36 @@ body {
     margin: 1rem auto;
     padding: 1.5rem 0;
 }
+.settings .area #msg {
+    width: 90%;
+    font-size: 12.5px;
+    text-align: center;
+    transition: 0.3s ease-in;
+    animation: zoom 0.3s linear;
+    margin-top: 2rem;
+}
+.settings .area .error {
+    background: rgba(222, 36, 0, 0.157);
+    color: rgb(186, 30, 0);
+    padding: 0.5rem;
+    border-radius: 3px;
+    margin: 0.3rem auto;
+    font-weight: 600;
+    border-width: 1px;
+    border-style: dashed;
+    border-color: rgb(186, 30, 0);
+}
+.settings .area .success {
+    background: rgba(5, 222, 0, 0.157);
+    color: rgb(23, 186, 0);
+    padding: 0.5rem;
+    border-radius: 3px;
+    margin: 0.3rem auto;
+    font-weight: 600;
+    border-width: 1px;
+    border-style: dashed;
+    border-color: rgb(23, 186, 0);
+}
 .settings .area #p-info {
     width: 100%;
     justify-content: left;

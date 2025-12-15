@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const config = require("../configs/index")
+const config = require("../configs/index");
 
 const createJWT = async payload => {
     const secretKey = config.SECRET_KEY;
@@ -8,7 +8,7 @@ const createJWT = async payload => {
 };
 const decodeJWT = async token => {
     try {
-        const secretKey = logger.SECRET_KEY;
+        const secretKey = config.SECRET_KEY;
         return jwt.verify(token, secretKey);
     } catch (err) {
         return null;
@@ -23,4 +23,4 @@ const setCookie = async (res, value) => {
     });
     return true;
 };
-module.exports = { createJWT, decodeJWT ,setCookie};
+module.exports = { createJWT, decodeJWT, setCookie };

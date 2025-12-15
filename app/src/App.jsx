@@ -12,6 +12,7 @@ import Chats from "./pages/Chats";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import VerifyOtp from "./pages/VerifyOtp";
+import ResetPassword from "./pages/ResetPassword";
 import useAuth from "./store/useAuth";
 
 const App = () => {
@@ -45,6 +46,11 @@ const App = () => {
                     path="/verify-otp"
                     element={!user ||
                         user.isVerified ? <Navigate to="/" /> : <VerifyOtp />
+                    }
+                />
+                <Route
+                    path="/reset-password"
+                    element={ <ResetPassword />
                     }
                 />
             </Routes>
