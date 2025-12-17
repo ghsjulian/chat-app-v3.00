@@ -10,6 +10,14 @@ import useApp from "../store/useApp";
 
 const Layouts = () => {
   const { chatSettings } = useApp();
+  useEffect(() => {
+    document.body.classList.add(chatSettings.appTheme);
+    if (chatSettings.appTheme === "dark") {
+      document.body.style = "#000000";
+    } else {
+      document.body.style = "#ffffffff";
+    }
+  }, []);
 
   return (
     <main className={`main-container`}>
@@ -17,7 +25,7 @@ const Layouts = () => {
       {/*-->Add a condition,
             if selected user then 
             show chat header<--*/}
-      {/*<ChatHeader/>*/}
+      <ChatHeader />
       <Outlet />
     </main>
   );

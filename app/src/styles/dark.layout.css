@@ -7,15 +7,28 @@
 :root {
   --dark-bg: #000000e4;
   --dark-container: #17191b;
-  --dark-header-side-footer: #191e23;
-  --dark-border: #686d72;
+  --dark-header-side-footer: #112222;
+  --dark-border: #ffffff;
+  --white: #ffffff;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
 }
 html {
   font-family: "Poppins", sans-serif;
   font-weight: 600;
   font-style: normal;
 }
-
+html,
+body,
+* {
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
 /* .poppins-bold {
     font-family: "Poppins", sans-serif;
     font-weight: 700;
@@ -28,10 +41,14 @@ html {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: var(--dark-bg);
   color: var(--dark-border);
 }
-
+.dark {
+  background: var(--dark-bg);
+}
+.dark svg {
+  color: var(--white);
+}
 .dark .main-container {
   position: relative;
   width: 90vw;
@@ -64,6 +81,7 @@ html {
   border-right: 2px solid transparent;
   transition: all 0.3s ease;
   z-index: 10;
+  box-shadow: var(--shadow);
 }
 
 /* header, chatbox, footer positioned to the right of the sidebar */
@@ -94,6 +112,7 @@ html {
   padding: 0 1rem;
   transition: left 0.3s ease, width 0.3s ease;
   z-index: 10;
+  box-shadow: var(--shadow);
 }
 .dark .chat-header .user {
   display: flex;
@@ -182,6 +201,7 @@ html {
   background: var(--dark-container);
   border-bottom: 1px solid var(--dark-border);
   z-index: 190;
+  box-shadow: var(--shadow);
 }
 .dark .settings .settings-head h3 {
   color: var(--blue);
@@ -275,8 +295,8 @@ html {
   outline: none;
   border-width: 1px;
   border-style: dashed;
-  border-color: #04566c;
-  color: #04566c;
+  border-color: #e7eef0;
+  color: #f3f8fa;
   background: transparent;
   font-weight: 500;
   border-radius: 5px;
@@ -292,8 +312,8 @@ html {
   outline: none;
   border-width: 1px;
   border-style: dashed;
-  border-color: #04566c;
-  color: #04566c;
+  border-color: #e7eef0;
+  color: #f3f8fa;
   background: transparent;
   font-weight: 500;
   border-radius: 5px;
@@ -389,6 +409,7 @@ html {
   align-items: center;
   padding: 0 1rem;
   transition: left 0.3s ease, width 0.3s ease;
+  box-shadow: var(--shadow);
 }
 .dark .selected-media {
   position: absolute;
@@ -447,7 +468,7 @@ html {
 .dark .footer .input-wrapper input {
   outline: none;
   width: 80%;
-  border: 2px solid var(--text);
+  border: 1px solid var(--text);
   background: transparent;
   font-weight: 700;
   color: var(--time);
@@ -477,9 +498,9 @@ html {
 }
 .dark .side-top .search {
   margin-top: 2px;
-  border: 2px solid var(--dark-border);
+  border: 1px solid var(--dark-border);
   border-radius: 15px;
-  padding: 0.4rem 0.3rem;
+  padding: 0.2rem 0.3rem;
 }
 .dark .side-top .search input {
   width: 100%;
@@ -487,7 +508,7 @@ html {
   border: none;
   background: transparent;
   color: var(--dark-border);
-  padding: 0.5rem;
+  padding: 0.2rem 0.5rem;
 }
 .dark .sidebar .users-list {
   width: 100%;
@@ -498,7 +519,7 @@ html {
   overflow-y: auto;
 }
 .dark .users-list .active {
-  background: var(--active-chat);
+  /* background: var(--active-chat); */
   border-radius: 2px;
 }
 .dark .users-list a {
@@ -607,7 +628,7 @@ html {
 /* Received messages (left) */
 .dark .message.received {
   align-self: flex-start;
-  background: var(--received-bg);
+  background: #979e9e;
   color: var(--text-received);
   border-top-left-radius: 15px;
   border-top-right-radius: 15px;
@@ -709,16 +730,12 @@ html {
 }
 
 /* Scrollbar styling (WebKit) */
-.dark .messages::-webkit-scrollbar {
-  width: 10px;
+html::-webkit-scrollbar {
+  width: 0;
 }
 
-.dark .messages::-webkit-scrollbar-track {
+html::-webkit-scrollbar-track {
   background: transparent;
-}
-.dark .messages::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.08);
-  border-radius: 99px;
 }
 
 /* If you later add an input area, leave room for safe-area bottom */

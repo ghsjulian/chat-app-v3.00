@@ -34,7 +34,18 @@ html {
   font-weight: 600;
   font-style: normal;
 }
-
+html,
+body,
+* {
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
 /* .poppins-bold {
     font-family: "Poppins", sans-serif;
     font-weight: 700;
@@ -506,7 +517,7 @@ body {
   overflow-y: auto;
 }
 .white .users-list .active {
-  background: var(--active-chat);
+  /* background: var(--active-chat); */
   border-radius: 2px;
 }
 .white .users-list a {
