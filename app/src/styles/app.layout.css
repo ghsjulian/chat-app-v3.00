@@ -400,6 +400,7 @@ body {
 }
 .white .row .box input {
   color: #006ca1;
+  width: 80%;
 }
 .white .footer {
   position: absolute;
@@ -470,7 +471,7 @@ body {
 }
 .white .footer .input-wrapper input {
   outline: none;
-  width: 80%;
+  width: 90%;
   border: 2px solid var(--text);
   background: transparent;
   font-weight: 700;
@@ -500,7 +501,7 @@ body {
   margin-top: 2px;
   border: 2px solid var(--text);
   border-radius: 15px;
-  padding: 0.4rem 0.3rem;
+  padding: 0.2rem 0.3rem;
 }
 .white .side-top .search input {
   width: 100%;

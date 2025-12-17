@@ -449,7 +449,6 @@ body::-webkit-scrollbar,
   height: 100%;
   border-radius: 5px;
   background: var(--dark-bg);
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -464,14 +463,15 @@ body::-webkit-scrollbar,
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0 0.5rem;
 }
 .dark .footer .input-wrapper input {
   outline: none;
-  width: 80%;
+  width: 90%;
   border: 1px solid var(--text);
   background: transparent;
   font-weight: 700;
-  color: var(--time);
+  color: var(--white);
   padding: 0.6rem 1rem;
   border-radius: 15px;
 }
