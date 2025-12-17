@@ -7,9 +7,11 @@ import Footer from "./Footer";
 import "../styles/app.layout.css";
 import "../styles/dark.layout.css";
 import useApp from "../store/useApp";
+import useChat from "../store/useChat";
 
 const Layouts = () => {
-  const { chatSettings } = useApp();
+  const { selectedChat } = useChat();
+  const { chatSettings, path } = useApp();
   useEffect(() => {
     document.body.classList.add(chatSettings.appTheme);
     if (chatSettings.appTheme === "dark") {
@@ -25,7 +27,7 @@ const Layouts = () => {
       {/*-->Add a condition,
             if selected user then 
             show chat header<--*/}
-      <ChatHeader />
+      {selectedChat && path !== "/" && path !== "/settings" && <ChatHeader />}
       <Outlet />
     </main>
   );
