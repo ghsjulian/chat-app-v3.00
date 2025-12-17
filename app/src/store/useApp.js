@@ -30,6 +30,7 @@ const useApp = create((set, get) => ({
           appTheme: data.appTheme,
           chatTheme: data.chatTheme,
         };
+        set({ chatSettings: appInfo });
         localStorage.setItem(
           "chat-settings",
           JSON.stringify({
@@ -38,7 +39,7 @@ const useApp = create((set, get) => ({
             chatTheme: data.chatTheme,
           })
         );
-        set({ chatSettings: appInfo });
+        document.body.classList.add(data.appTheme);
         showMessage(response.data.message, true);
       }
     } catch (error) {

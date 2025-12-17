@@ -197,7 +197,7 @@ body::-webkit-scrollbar,
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.7rem 1.3rem;
+  padding: 0.5rem 1.3rem;
   background: var(--dark-container);
   border-bottom: 1px solid var(--dark-border);
   z-index: 190;
@@ -210,6 +210,7 @@ body::-webkit-scrollbar,
   display: none;
   cursor: pointer;
   color: var(--dark-border);
+  margin-top: 8px;
 }
 .dark .settings .area {
   width: 100%;
@@ -467,7 +468,7 @@ body::-webkit-scrollbar,
 }
 .dark .footer .input-wrapper input {
   outline: none;
-  width: 90%;
+  width: 50%;
   border: 1px solid var(--text);
   background: transparent;
   font-weight: 700;
@@ -813,5 +814,8 @@ html::-webkit-scrollbar-track {
   .dark .menu-btn {
     cursor: pointer;
     padding: 0.25rem;
+  }
+  .dark .footer .input-wrapper input {
+    width: 90%;
   }
 }

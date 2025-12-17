@@ -196,9 +196,11 @@ body {
   flex-direction: column;
   align-items: center;
   transition: left 0.3s ease, width 0.3s ease;
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden;
-  --webkit-scroll-behavior: smooth;
+  /* overflow-y: auto;
+  overflow-x: hidden;
+  --webkit-scroll-behavior: smooth; */
 }
 .white .settings .settings-head {
   position: absolute;
@@ -207,7 +209,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.7rem 1.3rem;
+  padding: 0.5rem 1.3rem;
   background: var(--app-container);
   border-bottom: 1px solid var(--text);
   z-index: 190;
@@ -218,15 +220,13 @@ body {
 .white .settings-head #back {
   display: none;
   cursor: pointer;
+  margin-top: 8px;
 }
 .white .settings .area {
-  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 1rem auto;
-  padding: 1.5rem 0;
 }
 .white .settings .area #msg {
   width: 90%;
@@ -314,7 +314,7 @@ body {
   margin: 0.7rem 0;
 }
 .white .settings .area .row input {
-  width: 90%;
+  width: 30%;
   outline: none;
   border-width: 1px;
   border-style: dashed;
@@ -816,5 +816,8 @@ body {
   .white .menu-btn {
     cursor: pointer;
     padding: 0.25rem;
+  }
+  .white .settings .area .row input {
+    width: 90%;
   }
 }
