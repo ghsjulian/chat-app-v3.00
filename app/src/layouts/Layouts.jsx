@@ -9,18 +9,18 @@ import "../styles/dark.layout.css";
 import useApp from "../store/useApp";
 
 const Layouts = () => {
-    const { chatSettings } = useApp();
+  const { chatSettings } = useApp();
 
-    return (
-        <main className={`main-container ${chatSettings.appTheme}ggs dark`}>
-            <Sidebar />
-            {/*-->Add a condition,
+  return (
+    <main className={`main-container`}>
+      <Sidebar />
+      {/*-->Add a condition,
             if selected user then 
             show chat header<--*/}
-            {/*<ChatHeader/>*/}
-            <Outlet />
-        </main>
-    );
+      {/*<ChatHeader/>*/}
+      <Outlet />
+    </main>
+  );
 };
 
 export default Layouts;
