@@ -60,8 +60,8 @@
     border-radius: 50%;
 }
 .form input,
-button,
-p {
+.form button,
+.form p {
     outline: none;
     background: transparent;
     width: 90%;

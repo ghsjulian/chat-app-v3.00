@@ -11,8 +11,8 @@ const User = () => {
                     <img src="./ghs.png" />
                     <div className="status"></div>
                 </div>
-                <div className="u-name">
-                    <strong>Ghs Julian</strong>
+                <div className="name">
+                    <span>Ghs Julian</span>
                     <p>This is a test message</p>
                 </div>
             </div>

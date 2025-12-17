@@ -1,16 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import ChatHeader from "./ChatHeader";
 import Chatbox from "./Chatbox";
 import Footer from "./Footer";
 import "../styles/app.layout.css";
-import useApp from "../store/useApp"
+import "../styles/dark.layout.css";
+import useApp from "../store/useApp";
 
 const Layouts = () => {
-    const {chatSettings} = useApp()
+    const { chatSettings } = useApp();
+
     return (
-        <main className={`main-container ${chatSettings.appTheme}`}>
+        <main className={`main-container ${chatSettings.appTheme}ggs dark`}>
             <Sidebar />
             {/*-->Add a condition,
             if selected user then 
