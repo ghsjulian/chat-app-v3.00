@@ -39,7 +39,7 @@ const App = () => {
         <Route
           path="/verify-otp"
           element={
-            user.isVerified ? <Navigate to="/" /> : <VerifyOtp />
+            user?.isVerified ? <Navigate to="/" /> : <VerifyOtp />
           }
         />
         <Route

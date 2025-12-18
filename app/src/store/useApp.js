@@ -6,6 +6,7 @@ const useApp = create((set, get) => ({
   isLoadingUsers: false,
   isMenuActive: false,
   isSaving: false,
+  chatUsers : [],
   chatSettings: JSON.parse(localStorage.getItem("chat-settings")) || {
     isSound: true,
     appTheme: "white",
@@ -69,8 +70,10 @@ const useApp = create((set, get) => ({
   renderUsers: async (term, filter = {}) => {
     set({ isLoadingUsers: true });
     try {
-      const response = await axios.get(`/auth/get-users?term=${term}?limit=10`);
-      console.log(response.data);
+      const response = await axios.get(`/chats/get-chat-users?term=${term}&limit=10`);
+      if(response?.data?.success){
+          set({chatUsers:response?.data?.users})
+      }
     } catch (error) {
       console.log(error.message);
     } finally {
