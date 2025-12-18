@@ -9,6 +9,7 @@ const useAuth = create((set, get) => ({
     isResending: false,
     isReseting: false,
     isLogout: false,
+    isDeleting: false,
 
     signupNow: async (data, showMessage, navigate) => {
         try {
@@ -132,6 +133,24 @@ const useAuth = create((set, get) => ({
             console.log(error.message)
         }finally{
             set({isLogout:false})
+        }
+    },
+    deleteAccount: async (navigate) => {
+        try {
+            if (get().user === null) return;
+            
+            set({isDeleting:true})
+            const response = await axios.delete("/auth/delete-account");
+            if (response?.data?.success) {
+                set({ user: null });
+                    localStorage.removeItem("chat-user");
+                    localStorage.removeItem("chat-settings")
+                navigate("/login")
+            }
+        } catch (error) {
+            console.log(error.message)
+        }finally{
+            set({isDeleting:false})
         }
     },
     resetPassword: async (data,showMessage,navigate) => {

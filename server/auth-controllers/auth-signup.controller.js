@@ -19,20 +19,19 @@ const authSignupController = async (req, res) => {
         });
         if (existUser) throw new Error("User Already Registered");
         const hash = await createHash(password.trim());
-        /*
         const uploadResult = await Uploader(avatar, getPublicId());
         let avatar_obj = {
             public_id: uploadResult.public_id,
             img_url: uploadResult.secure_url
         };
-        */
         const newUser = new userModel({
             name,
             email,
             password: hash,
-            avatar: {}, //avatar_obj
+            avatar: avatar_obj,
             isVerified: false
         });
+
         const token = await createJWT({
             _id: newUser._id,
             name: newUser.name,
@@ -48,12 +47,14 @@ const authSignupController = async (req, res) => {
         await setCookie(res, token);
         // await sendMail(otp)
         // Send Otp and complete the signup
-        const user = await userModel.findOne({email : email.trim()}).select("-password -otp")
+        const user = await userModel
+            .findOne({ email: email.trim() })
+            .select("-password -otp");
         return res.status(201).json({
             user,
-            access_token : token,
-            success : true,
-            message : "User Registration Successfully"
+            access_token: token,
+            success: true,
+            message: "User Registration Successfully"
         });
     } catch (error) {
         return res.status(505).json({

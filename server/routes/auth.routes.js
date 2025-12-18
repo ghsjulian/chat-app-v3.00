@@ -6,6 +6,7 @@ const resendOTPController = require("../auth-controllers/resend-otp.controller")
 const logoutController = require("../auth-controllers/auth-logout.controller");
 const settingsController = require("../auth-controllers/auth-settings.controller");
 const resetPasswordController = require("../auth-controllers/reset-password.controller");
+const deleteAccount = require("../auth-controllers/auth-delete-account.controller");
 const isAuth = require("../middlewares/is-auth")
 
 
@@ -16,5 +17,6 @@ router.post("/resend-otp", isAuth,resendOTPController);
 router.post("/logout", isAuth,logoutController);
 router.post("/reset-password", isAuth,resetPasswordController);
 router.put("/save-settings", isAuth,settingsController);
+router.delete("/delete-account", isAuth,deleteAccount);
 
 module.exports = router;

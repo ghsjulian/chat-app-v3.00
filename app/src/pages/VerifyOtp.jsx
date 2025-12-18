@@ -76,7 +76,7 @@ const VerifyOtp = () => {
                                 setRemaining(60);
                             }}
                         >
-                            {isResending ? "Please Wait..." : "Resend OTP"}
+                            {isResending ? "Please Wait..." : "  Resend"}
                         </NavLink>
                     )}
                 </p>

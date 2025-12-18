@@ -6,20 +6,21 @@ import Chatbox from "./Chatbox";
 import Footer from "./Footer";
 import "../styles/app.layout.css";
 import "../styles/dark.layout.css";
-import useApp from "../store/useApp";
 import useChat from "../store/useChat";
+import useApp from "../store/useApp";
 
 const Layouts = () => {
   const { selectedChat } = useChat();
-  const { chatSettings, path } = useApp();
-  useEffect(() => {
+  const { chatSettings } = useApp();
+  
+useEffect(()=>{
     document.body.classList.add(chatSettings.appTheme);
     if (chatSettings.appTheme === "dark") {
       document.body.style = "#000000";
     } else {
       document.body.style = "#ffffffff";
     }
-  }, []);
+},[])
 
   return (
     <main className={`main-container`}>

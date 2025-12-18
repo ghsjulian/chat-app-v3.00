@@ -218,7 +218,7 @@ body::-webkit-scrollbar,
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 1rem auto;
+  margin: 1rem 0;
   padding: 1.5rem 0;
 }
 .dark .settings .area #msg {
@@ -263,7 +263,7 @@ body::-webkit-scrollbar,
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0.7rem 0;
+  margin: 0.8rem 0;
 }
 .dark .settings .area .row .profile-img {
   position: relative;
@@ -328,7 +328,7 @@ body::-webkit-scrollbar,
   margin: 0 0;
 }
 .dark .settings .area .row #logout-btn {
-  background: #c82900;
+  background: #008bd9;
   color: #fff;
   font-weight: 600;
   padding: 0.5rem 0.4rem;
