@@ -7,6 +7,11 @@ const Chatbox = () => {
       <content className="chatbox">
         <div className="messages">
           <MessageBubble />
+          <MessageBubble />
+          <MessageBubble />
+          <MessageBubble />
+          <MessageBubble />
+          <MessageBubble />
         </div>
       </content>
     </>

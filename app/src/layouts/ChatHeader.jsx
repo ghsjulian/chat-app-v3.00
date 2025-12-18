@@ -1,11 +1,14 @@
 import React from "react";
-import { IoMenu } from "react-icons/io5";
+import { IoArrowBackCircleOutline } from "react-icons/io5";
 import useApp from "../store/useApp";
 
 const Header = () => {
   const { toggleMenu } = useApp();
   return (
     <header className="chat-header">
+      <span id="back" onClick={() => history.back()}>
+        <IoArrowBackCircleOutline size={28} />
+      </span>
       <div className="user">
         <img src="./ghs.png" />
         <div className="user-name">
@@ -13,9 +16,6 @@ const Header = () => {
           <p>Active Now</p>
         </div>
       </div>
-      {/* <label onClick={toggleMenu} htmlFor="menu" className="menu-btn">
-                <IoMenu size={24} />
-            </label> */}
     </header>
   );
 };

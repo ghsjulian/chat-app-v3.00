@@ -11,16 +11,19 @@ import useApp from "../store/useApp";
 
 const Layouts = () => {
   const { selectedChat } = useChat();
-  const { chatSettings } = useApp();
-  
-useEffect(()=>{
+  const { chatSettings, path } = useApp();
+
+  useEffect(() => {
+    if (document.body.hasAttribute("class")) {
+      document.body.removeAttribute("class");
+    }
     document.body.classList.add(chatSettings.appTheme);
     if (chatSettings.appTheme === "dark") {
       document.body.style = "#000000";
     } else {
       document.body.style = "#ffffffff";
     }
-},[])
+  }, []);
 
   return (
     <main className={`main-container`}>
