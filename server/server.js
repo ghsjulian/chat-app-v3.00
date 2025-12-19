@@ -13,7 +13,6 @@ const cookieParser = require("cookie-parser");
 
 const config = require("./configs");
 const requestIdMiddleware = require("./middlewares/request-id");
-const errorHandler = require("./middlewares/error-handler");
 // const routes = require("./routes");
 const { connectDB, isConnected } = require("./db/mongoose");
 const createSocket = require("./socket");
@@ -39,7 +38,7 @@ app.use(cookieParser());
 app.use(express.json({ limit: config.BODY_LIMIT }));
 app.use(express.urlencoded({ extended: true, limit: config.BODY_LIMIT }));
 app.use(requestIdMiddleware);
-app.use(errorHandler);
+
 
 app.use(
     morgan((tokens, req, res) => {

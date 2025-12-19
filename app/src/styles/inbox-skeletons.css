@@ -1,0 +1,130 @@
+.sk--header {
+    height: 60px;
+    background: white;
+    border-bottom: 1px solid #ddd;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.sk--title-skeleton {
+    width: 120px;
+    height: 28px;
+    background: #e4e6eb;
+    border-radius: 8px;
+    animation: pulse 0.6s infinite;
+}
+.sk--search {
+    padding: 12px 16px;
+    background: white;
+}
+.sk--search-skeleton {
+    height: 44px;
+    background: #f0f2f5;
+    border-radius: 30px;
+    animation: pulse 0.6s infinite;
+}
+.sk--chat-list {
+    flex: 1;
+    overflow: hidden;
+    background: white;
+}
+.sk--chat-item {
+    width: 100%;
+    position: relative;
+    display: flex;
+    padding: 12px 0;
+    gap: 12px;
+}
+.sk--avatar-skeleton {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #ffffff;
+    flex-shrink: 0;
+    animation: pulse 1.6s infinite;
+}
+.sk--text-lines {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    animation: pulse 1.3s infinite;
+}
+.sk--line-1 {
+    width: 60%;
+    height: 17px;
+    background: #e4e6eb;
+    border-radius: 4px;
+    animation: pulse 1.2s infinite;
+}
+.sk--line-2 {
+    width: 85%;
+    height: 15px;
+    background: #eeeff3;
+    border-radius: 4px;
+    animation: pulse 1s infinite;
+}
+.sk--time-skeleton {
+    position: absolute;
+    right: 5px;
+    bottom: 2px;
+    width: 50px;
+    height: 15px;
+    background: #e7e7ea;
+    border-radius: 4px;
+    align-self: flex-start;
+    animation: pulse 0.9s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .sk--header,
+    .sk--search,
+    .sk--chat-list {
+        background: #242526;
+    }
+    .sk--title-skeleton,
+    .sk--search-skeleton,
+    .sk--avatar-skeleton,
+    .sk--line-1,
+    .sk--line-2,
+    .sk--time-skeleton {
+        background: #3a3b3c;
+    }
+    .sk--line-2,
+    .sk--time-skeleton {
+        background: #4e4f50;
+    }
+}
+@media (prefers-color-scheme: light) {
+    .sk--header,
+    .sk--search,
+    .sk--chat-list {
+        background: #f0f1f2;
+    }
+    .sk--title-skeleton,
+    .sk--search-skeleton,
+    .sk--avatar-skeleton,
+    .sk--line-1,
+    .sk--line-2,
+    .sk--time-skeleton {
+        background: #edeff0;
+    }
+    .sk--line-2,
+    .sk--time-skeleton {
+        background: #e4e5e7;
+    }
+}

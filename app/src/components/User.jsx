@@ -8,7 +8,7 @@ const User = ({user}) => {
     <NavLink onClick={toggleMenu} className="" to={`/chats/${user?._id}`}>
       <div className="left">
         <div className="user-img">
-          <img src={user?.avatar?.img_url || "/ghs.png"} />
+          <img src={user?.avatar?.img_url || "/boy.png"} />
           <div className="status"></div>
         </div>
         <div className="name">

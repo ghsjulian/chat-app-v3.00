@@ -18,8 +18,11 @@ const messageSchema = new mongoose.Schema(
         receiver: {
             type: String,
             required : true
+        },
+        seen : {
+            type : Boolean,
+            default : false
         }
-        
     },
     {
         timestamps: true

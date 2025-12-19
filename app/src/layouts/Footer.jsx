@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import { GrAttachment } from "react-icons/gr";
 import { MdSend } from "react-icons/md";
-import useMessage from "../store/useMessage";
+import useChat from "../store/useChat";
 import isValid from "../libs/is-valid-text";
 
 const Footer = () => {
-    const { sendMessage } = useMessage();
+    const { sendMessage,isSendingMessage } = useChat();
     const [text, setText] = useState("");
     const [files, setFiles] = useState([]); // flat array of File objects
     const textRef = useRef(null);
@@ -58,11 +58,12 @@ const Footer = () => {
 
     const handleSend = () => {
         if (!isValid(text) && files.length === 0) return;
+        if(isSendingMessage) return 
         // send Message object containing text and files array (or null)
-        sendMessage({
-            text: isValid(text) ? text : "",
-            files: files.length ? files : null
-        });
+        let formData = new FormData()
+        formData.append("text",text.trim())
+        formData.append("files",files)
+        sendMessage(formData);
         setText("");
         setFiles([]);
         if (textRef.current) textRef.current.focus();

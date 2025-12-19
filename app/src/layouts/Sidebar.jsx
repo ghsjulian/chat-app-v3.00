@@ -3,11 +3,19 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { IoSearchOutline } from "react-icons/io5";
 import { IoSettingsOutline } from "react-icons/io5";
 import useApp from "../store/useApp";
+import useChat from "../store/useChat";
 import User from "../components/User";
+import InboxSkeleton from "../skeletons/InboxSkeleton";
+import NoUser from "../components/NoUser";
 
 const Sidebar = () => {
-    const { isMenuActive, setPath, path, renderUsers, isLoadingUsers,chatUsers } =
-        useApp();
+    const {
+        isMenuActive,
+        setPath,
+        path
+        
+    } = useApp();
+    const {isLoadingUsers,renderUsers,chatUsers} = useChat()
     const location = useLocation();
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState("");
@@ -38,13 +46,15 @@ const Sidebar = () => {
                 </div>
             </div>
             <div className="users-list">
-                {/*Here I will apply the logic,
-                like render the users and search users also */}
-                {
-                    chatUsers?.length>0 && chatUsers?.map((user, index) =>{
-                        return <User key={index} user={user}/>
+                {isLoadingUsers ? (
+                    <InboxSkeleton />
+                ) : (
+                    chatUsers?.length > 0 &&
+                    chatUsers?.map((user, index) => {
+                        return <User key={index} user={user} />;
                     })
-                }
+                )}
+                {chatUsers?.length === 0 && !isLoadingUsers && <NoUser/>}
             </div>
         </aside>
     );

@@ -607,6 +607,18 @@ body {
   overflow-x: hidden;
   overflow-y: auto;
 }
+.white .users-list .no-user {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.white .users-list .no-user h4 {
+    color: #202224;
+    margin: .2rem auto;
+}
 .white .users-list .active {
   /* background: var(--active-chat); */
   border-radius: 2px;

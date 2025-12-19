@@ -31,7 +31,7 @@ const Layouts = () => {
       {/*-->Add a condition,
             if selected user then 
             show chat header<--*/}
-      {selectedChat && path !== "/" && path !== "/settings" && <ChatHeader />}
+      {selectedChat !== null && path !== "/" && path !== "/settings" && <ChatHeader />}
       <Outlet />
     </main>
   );

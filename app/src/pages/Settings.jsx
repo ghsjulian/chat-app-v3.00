@@ -127,7 +127,7 @@ const Settings = () => {
         <div className="row">
           <p>Your Profile Image</p>
           <div className="profile-img">
-            <img src={userInfo.avatar ? userInfo.avatar : "/ghs.png"} />
+            <img src={userInfo.avatar ? userInfo.avatar : "/boy.png"} />
             <label htmlFor="img">Change</label>
             <input onChange={handleFile} id="img" type="file" multiple hidden />
           </div>
