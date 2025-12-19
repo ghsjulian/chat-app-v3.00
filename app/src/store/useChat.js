@@ -1,12 +1,17 @@
 import { create } from "zustand";
 import axios from "../libs/axios";
+import useAuth from "./useAuth";
 
+const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_RETRY = 3;
 const useChat = create((set, get) => ({
     selectedChat: null,
     chatUsers: [],
+    chats: [],
     isLoadingUsers: false,
     isFetchingChats: false,
-    isSendingMessage : false,
+    isSendingMessage: false,
+    uploadProgress: {},
 
     getChat: async id => {
         set({ isFetchingChats: true });
@@ -37,22 +42,107 @@ const useChat = create((set, get) => ({
             set({ isLoadingUsers: false });
         }
     },
-    sendMessage : async(data)=>{
-        try {
-            set({isSendingMessage:true})
-            const response = await axios.post("/chats/send-message?id="+get()?.selectedChat?._id,data,{headers: {
-      "Content-Type": "multipart/form-data"
-    }})
-            if(response?.data?.success){
-            console.log(response.data)
+
+    uploadFileChunks: async fileObj => {
+        const { file, uploadId, uploadedChunks = 0 } = fileObj;
+
+        if (!file || !uploadId) {
+            throw new Error("Invalid file object");
+        }
+
+        const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+
+        for (
+            let chunkIndex = uploadedChunks;
+            chunkIndex < totalChunks;
+            chunkIndex++
+        ) {
+            const start = chunkIndex * CHUNK_SIZE;
+            const end = Math.min(start + CHUNK_SIZE, file.size);
+            const chunk = file.slice(start, end);
+
+            let attempt = 0;
+            let success = false;
+
+            while (!success && attempt < MAX_RETRY) {
+                try {
+                    await axios.post(
+                        `/chats/upload-chunks` +
+                            `?uploadid=${uploadId}` +
+                            `&chunkindex=${chunkIndex}` +
+                            `&totalchunks=${totalChunks}` +
+                            `&filename=${encodeURIComponent(file.name)}` +
+                            `&filesize=${file.size}`,
+                        chunk,
+                        {
+                            headers: {
+                                "Content-Type": "application/octet-stream"
+                            },
+                            timeout: 0
+                        }
+                    );
+
+                    success = true;
+
+                    set(state => ({
+                        uploadProgress: {
+                            ...state.uploadProgress,
+                            [uploadId]: Math.round(
+                                ((chunkIndex + 1) / totalChunks) * 100
+                            )
+                        }
+                    }));
+                } catch (err) {
+                    attempt++;
+                    if (attempt >= MAX_RETRY) {
+                        throw new Error(`Upload failed: ${file.name}`);
+                    }
+                }
             }
-        } catch (error) {
-            console.log("error : ",error.message)
-        }finally{
-            set({isSendingMessage:false})
+        }
+
+        return {
+            uploadId,
+            name: file.name,
+            size: file.size
+        };
+    },
+
+    sendMessage: async (files, text) => {
+        try {
+            set({ isSendingMessage: true });
+            let uploadedFiles = [];
+
+            if (files.length > 0) {
+                uploadedFiles = await Promise.all(
+                    files.map(fileObj => get().uploadFileChunks(fileObj))
+                );
+            }
+
+            await axios.post(
+                `/chats/send-message?id=${get().selectedChat._id}`,
+                {
+                    text,
+                    files: uploadedFiles
+                }
+            );
+
+            const newMessage = {
+                sender: 1 ,// useAuth.getState().user._id,
+                receiver: 3,// get().selectedChat._id,
+                text,
+                files
+            };
+            set({
+                chats: [...get().chats, newMessage]
+            });
+            console.log(get().chats);
+        } catch (err) {
+            console.error(err.message);
+        } finally {
+            set({ isSendingMessage: false });
         }
     }
-    
 }));
 
 export default useChat;

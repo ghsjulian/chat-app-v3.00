@@ -507,10 +507,11 @@ body {
 }
 .white .selected-media {
   position: absolute;
-  top: -60px;
-  left: 0;
-  width: 350px;
-  padding: 0.3rem;
+  top: -100px;
+    left: 0;
+    width: 360px;
+    height: 100px;
+    padding: 0.8rem 0.3rem;
   background: var(--app-container);
 
   display: grid;
@@ -524,6 +525,12 @@ body {
   width: 55px;
   height: 55px;
   border: 2px solid var(--text);
+}
+.white .selected-media .progress {
+    color: var(--text-received);
+    font-weight: 300;
+    text-align: center;
+    margin: 0.3rem auto;
 }
 .white .selected-media .close {
   position: absolute;

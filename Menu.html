@@ -1,220 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Navbar with Toggle Sidebar</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f4f4;
-            min-height: 100vh;
-        }
-
-        /* Navbar Styles */
-        .navbar {
-            background-color: #333;
-            color: white;
-            padding: 1rem;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        /* Hamburger Menu Button */
-        .menu-toggle {
-            display: none; /* Hidden by default, visible on mobile */
-        }
-
-        .hamburger {
-            display: block;
-            width: 30px;
-            height: 20px;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .hamburger span {
-            background-color: white;
-            height: 3px;
-            width: 100%;
-            position: absolute;
-            border-radius: 3px;
-            transition: all 0.3s ease;
-        }
-
-        .hamburger span:nth-child(1) { top: 0; }
-        .hamburger span:nth-child(2) { top: 8px; }
-        .hamburger span:nth-child(3) { top: 16px; }
-
-        /* Transform hamburger to X when checked */
-        .menu-toggle:checked ~ .navbar .hamburger span:nth-child(1) {
-            transform: rotate(45deg);
-            top: 8px;
-        }
-
-        .menu-toggle:checked ~ .navbar .hamburger span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .menu-toggle:checked ~ .navbar .hamburger span:nth-child(3) {
-            transform: rotate(-45deg);
-            top: 8px;
-        }
-
-        /* Sidebar Menu */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -300px;
-            width: 300px;
-            height: 100vh;
-            background-color: #2c3e50;
-            padding-top: 80px;
-            transition: left 0.3s ease;
-            z-index: 999;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.2);
-        }
-
-        .sidebar ul {
-            list-style: none;
-        }
-
-        .sidebar ul li {
-            padding: 0;
-        }
-
-        .sidebar ul li a {
-            display: block;
-            color: #ecf0f1;
-            text-decoration: none;
-            padding: 15px 25px;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .sidebar ul li a:hover {
-            background-color: #34495e;
-            padding-left: 35px;
-        }
-
-        /* Show sidebar when checkbox is checked */
-        .menu-toggle:checked ~ .sidebar {
-            left: 0;
-        }
-
-        /* Overlay when menu is open */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            z-index: 998;
-        }
-
-        .menu-toggle:checked ~ .overlay {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* Main content area */
-        .main-content {
-            margin-top: 70px;
-            padding: 2rem;
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .menu-toggle {
-                display: block;
-            }
-
-            .navbar .logo {
-                margin-left: 40px; /* Space for hamburger */
-            }
-        }
-
-        @media (min-width: 769px) {
-            .hamburger {
-                display: none;
-            }
-
-            .sidebar {
-                left: 0;
-                width: 250px;
-            }
-
-            .main-content {
-                margin-left: 250px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>File Preview</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .preview-item {
+      border: 1px solid #ddd;
+      padding: 10px;
+      max-width: 250px;
+    }
+    img, video {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+    audio {
+      width: 100%;
+    }
+  </style>
 </head>
 <body>
 
-    <!-- Hidden checkbox for toggle -->
-    <input type="checkbox" id="menu-toggle" class="menu-toggle">
+  <h3>Select Images, Audio, or Videos</h3>
 
-    <!-- Overlay -->
-    <div class="overlay" onclick="document.getElementById('menu-toggle').checked = false;"></div>
+  <input
+    type="file"
+    id="fileInput"
+    multiple
+    accept="image/*,audio/*,video/*"
+  />
 
-    <!-- Sidebar Menu -->
-    <nav class="sidebar">
-        <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Services</a></li>
-            <li><a href="#">Portfolio</a></li>
-            <li><a href="#">Blog</a></li>
-            <li><a href="#">Contact</a></li>
-        </ul>
-    </nav>
+  <div class="preview" id="preview"></div>
 
-    <!-- Navbar -->
-    <header class="navbar">
-        <label for="menu-toggle" class="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
-        </label>
-        <div class="logo">MyBrand</div>
-        <div class="nav-links-desktop">
-            <!-- Desktop links can go here if needed -->
-        </div>
-    </header>
+  <script>
+    const fileInput = document.getElementById("fileInput");
+    const preview = document.getElementById("preview");
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <h1>Welcome to Our Website</h1>
-        <p>This is a responsive navbar with a sliding sidebar menu using only HTML and CSS (no JavaScript). Click the hamburger icon on mobile to open the menu.</p>
-        <p>On desktop (above 768px), the sidebar is always visible on the left.</p>
-    </div>
+    fileInput.addEventListener("change", () => {
+      preview.innerHTML = "";
+
+      [...fileInput.files].forEach(file => {
+        const url = URL.createObjectURL(file);
+        const wrapper = document.createElement("div");
+        wrapper.className = "preview-item";
+
+        if (file.type.startsWith("image/")) {
+          const img = document.createElement("img");
+          img.src = url;
+          wrapper.appendChild(img);
+
+        } else if (file.type.startsWith("audio/")) {
+          const audio = document.createElement("audio");
+          audio.controls = true;
+          audio.src = url;
+          wrapper.appendChild(audio);
+
+        } else if (file.type.startsWith("video/")) {
+          const video = document.createElement("video");
+          video.controls = true;
+          video.src = url;
+          wrapper.appendChild(video);
+        }
+
+        preview.appendChild(wrapper);
+      });
+    });
+  </script>
 
 </body>
 </html>

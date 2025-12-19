@@ -1,53 +1,38 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { GrAttachment } from "react-icons/gr";
 import { MdSend } from "react-icons/md";
+import axios from "axios";
+//import { v4 as uuidv4 } from "uuid";
 import useChat from "../store/useChat";
-import isValid from "../libs/is-valid-text";
+const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILES = 6;
 
 const Footer = () => {
-    const { sendMessage,isSendingMessage } = useChat();
+    const { sendMessage, isSendingMessage } = useChat();
     const [text, setText] = useState("");
-    const [files, setFiles] = useState([]); // flat array of File objects
+    const [files, setFiles] = useState([]); // { file, progress, uploadId }
     const textRef = useRef(null);
     const fileInputRef = useRef(null);
-    const MAX_FILES = 6;
 
-    // Helper: avoid duplicates by name + size
-    const mergeFiles = (existing, incoming) => {
-        const existingKeys = new Set(existing.map(f => `${f.name}-${f.size}`));
-        const filteredIncoming = incoming.filter(
-            f => !existingKeys.has(`${f.name}-${f.size}`)
-        );
-        return [...existing, ...filteredIncoming];
-    };
-
+    // Select files
     const handleFiles = e => {
-        const fl = e.target.files;
-        if (!fl || fl.length === 0) return;
-
-        const incoming = Array.from(fl);
-
-        // Merge while preventing duplicates
-        let merged = mergeFiles(files, incoming);
-
-        // Enforce max limit
-        if (merged.length > MAX_FILES) {
-            merged = merged.slice(0, MAX_FILES);
-            // optional: inform user they hit limit
-            // alert(`Maximum ${MAX_FILES} files allowed`);
-            console.warn(
-                `Maximum ${MAX_FILES} files allowed — extras were ignored.`
-            );
+        let selectedFiles = Array.from(e.target.files);
+        if (files.length + selectedFiles.length > MAX_FILES) {
+            selectedFiles = selectedFiles.slice(0, MAX_FILES - files.length);
         }
 
-        setFiles(merged);
+        const filesWithMeta = selectedFiles.map(file => ({
+            file,
+            progress: 0,
+            uploadId: Date.now() //uuidv4(),
+        }));
 
-        // Reset file input so selecting the same file again will trigger onChange
-        if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-        }
+        setFiles(prev => [...prev, ...filesWithMeta]);
+
+        if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
+    // Remove file
     const removeFileAt = index => {
         setFiles(prev => {
             const next = [...prev];
@@ -56,14 +41,12 @@ const Footer = () => {
         });
     };
 
-    const handleSend = () => {
-        if (!isValid(text) && files.length === 0) return;
-        if(isSendingMessage) return 
-        // send Message object containing text and files array (or null)
-        let formData = new FormData()
-        formData.append("text",text.trim())
-        formData.append("files",files)
-        sendMessage(formData);
+    // Upload all files in parallel
+    const handleSend = async () => {
+        if (!text.trim() && files.length === 0) return;
+        if (isSendingMessage) return;
+
+        await sendMessage(files, text.trim());
         setText("");
         setFiles([]);
         if (textRef.current) textRef.current.focus();
@@ -74,20 +57,23 @@ const Footer = () => {
             {files.length > 0 && (
                 <div className="selected-media">
                     {files.map((f, idx) => {
-                        const ext = f.type
-                            ? f.type.split("/")[1]
-                            : f.name.split(".").pop();
+                        const ext = f.file.type
+                            ? f.file.type.split("/")[1]
+                            : f.file.name.split(".").pop();
                         return (
-                            <div className="img" key={`${f.name}-${f.size}`}>
+                            <div
+                                className="img"
+                                key={`${f.file.name}-${f.file.size}`}
+                            >
                                 <button
                                     className="close"
                                     onClick={() => removeFileAt(idx)}
                                     type="button"
-                                    aria-label={`Remove ${f.name}`}
                                 >
                                     &times;
                                 </button>
                                 <div className="av">{ext}</div>
+                                <div className="progress">{f?.progress}%</div>
                             </div>
                         );
                     })}
@@ -104,8 +90,8 @@ const Footer = () => {
                     onChange={handleFiles}
                     type="file"
                     id="files"
-                    multiple={true}
-                    hidden={true}
+                    multiple
+                    hidden
                 />
 
                 <input

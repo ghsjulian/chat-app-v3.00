@@ -6,14 +6,10 @@ const express = require("express");
 const http = require("node:http");
 const helmet = require("helmet");
 const cors = require("cors");
-const compression = require("compression");
-const rateLimit = require("express-rate-limit");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 
 const config = require("./configs");
-const requestIdMiddleware = require("./middlewares/request-id");
-// const routes = require("./routes");
 const { connectDB, isConnected } = require("./db/mongoose");
 const createSocket = require("./socket");
 const app = express();
@@ -33,11 +29,15 @@ app.use(
         credentials: true
     })
 );
-app.use(compression());
 app.use(cookieParser());
+/*
 app.use(express.json({ limit: config.BODY_LIMIT }));
 app.use(express.urlencoded({ extended: true, limit: config.BODY_LIMIT }));
-app.use(requestIdMiddleware);
+app.use(express.raw({
+    type: "application/octet-stream",
+    limit: "1025mb"
+}));
+*/
 
 
 app.use(
@@ -56,15 +56,6 @@ app.use(
     })
 );
 
-const limiter = rateLimit({
-    windowMs:
-        (parseInt(config.RATE_LIMIT_WINDOW_MINUTES, 10) || 15) * 60 * 1000,
-    max: parseInt(config.RATE_LIMIT_MAX, 10) || 100,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: { error: "Too many requests, please try again later." }
-});
-app.use(limiter);
 
 // lightweight health/readiness
 app.get("/health", (req, res) =>
@@ -85,8 +76,14 @@ app.get("/ready", (req, res) => {
 app.use("/api/auth", require("./routes/auth.routes"));
 app.use("/api/chats", require("./routes/chats.routes"));
 
-/*-----------------------------------------------------------------------------------------------*/
 
+/*-----------------------------------------------------------------------------------------------*/
+app.use(express.json({ limit: config.BODY_LIMIT }));
+app.use(express.urlencoded({ extended: true, limit: config.BODY_LIMIT }));
+app.use(express.raw({
+    type: "application/octet-stream",
+    limit: "1025mb"
+}));
 // 404
 app.use((req, res) =>
     res.status(404).json({ error: "Not Found", requestId: req.id })
