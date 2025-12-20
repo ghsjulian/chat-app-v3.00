@@ -30,14 +30,13 @@ app.use(
     })
 );
 app.use(cookieParser());
-/*
 app.use(express.json({ limit: config.BODY_LIMIT }));
 app.use(express.urlencoded({ extended: true, limit: config.BODY_LIMIT }));
 app.use(express.raw({
     type: "application/octet-stream",
     limit: "1025mb"
 }));
-*/
+
 
 
 app.use(
@@ -78,12 +77,14 @@ app.use("/api/chats", require("./routes/chats.routes"));
 
 
 /*-----------------------------------------------------------------------------------------------*/
+/*
 app.use(express.json({ limit: config.BODY_LIMIT }));
 app.use(express.urlencoded({ extended: true, limit: config.BODY_LIMIT }));
 app.use(express.raw({
     type: "application/octet-stream",
     limit: "1025mb"
 }));
+*/
 // 404
 app.use((req, res) =>
     res.status(404).json({ error: "Not Found", requestId: req.id })

@@ -112,6 +112,15 @@ const useChat = create((set, get) => ({
         try {
             set({ isSendingMessage: true });
             let uploadedFiles = [];
+             const newMessage = {
+                sender: 1 ,// useAuth.getState().user._id,
+                receiver: 3,// get().selectedChat._id,
+                text,
+                files
+            };
+            set({
+                chats: [...get().chats, newMessage]
+            });
 
             if (files.length > 0) {
                 uploadedFiles = await Promise.all(
@@ -127,15 +136,7 @@ const useChat = create((set, get) => ({
                 }
             );
 
-            const newMessage = {
-                sender: 1 ,// useAuth.getState().user._id,
-                receiver: 3,// get().selectedChat._id,
-                text,
-                files
-            };
-            set({
-                chats: [...get().chats, newMessage]
-            });
+           
             console.log(get().chats);
         } catch (err) {
             console.error(err.message);

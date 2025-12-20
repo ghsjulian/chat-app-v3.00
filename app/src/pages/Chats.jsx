@@ -5,6 +5,7 @@ import MessageBubble from "../components/MessageBubble";
 import MediaBubble from "../components/MediaBubble";
 import useChat from "../store/useChat";
 import useApp from "../store/useApp";
+import PreviewMedia from "../components/PreviewMedia";
 
 const Chats = () => {
     const { getChat, chats } = useChat();
@@ -29,7 +30,7 @@ const Chats = () => {
                                 <MessageBubble key={index} chat={message} />
                             );
                         })}
-{/*
+
                     <div className="message sent">
                         <div className="sending-media">
                             <div className="media-item">
@@ -39,21 +40,30 @@ const Chats = () => {
                                 </div>
                             </div>
                             <div className="media-item">
-                                <video controls>
-                                    <source
-                                        src="./video.mp4"
-                                        type="video/mp4"
-                                    />
-                                </video>
+                                <img src="/video.png" />
+                                <div className="overly">
+                                    <p>100%</p>
+                                </div>
                             </div>
 
-                            <div className="media-item"></div>
+                            <div className="media-item">
+                                <img src="/audio.png" />
+                                <div className="overly">
+                                    <p>100%</p>
+                                </div>
+                            </div>
+                            <div className="media-item">
+                                <img src="/file.png" />
+                                <div className="overly">
+                                    <p>100%</p>
+                                </div>
+                            </div>
                         </div>
                         Yeah! How have you been?
                         <div className="message-time">10:34 AM</div>
                     </div>
-                    */}
                 </div>
+                 <PreviewMedia />
             </content>
             <Footer />
         </>
@@ -61,3 +71,22 @@ const Chats = () => {
 };
 
 export default Chats;
+/*
+<div class="preview-container">
+  <!-- Image -->
+  <div class="preview-item">
+    <img src="image.jpg" alt="preview" />
+  </div>
+
+  <!-- Video (muted & paused) -->
+  <div class="preview-item">
+    <video src="video.mp4" muted preload="metadata"></video>
+  </div>
+
+  <!-- Audio -->
+  <div class="preview-item audio">
+    <audio src="audio.mp3" controls></audio>
+  </div>
+</div>
+
+*/

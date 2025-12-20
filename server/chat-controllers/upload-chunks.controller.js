@@ -74,7 +74,7 @@ const uploadChunks = async (req, res) => {
             // ---------------- MERGE ----------------
             const finalFilePath = path.join(
                 FINAL_DIR,
-                `${uploadid}-${filename}`
+                `${uploadid}${path.extname(filename)}`
             );
 
             const finalWriteStream = fs.createWriteStream(finalFilePath);

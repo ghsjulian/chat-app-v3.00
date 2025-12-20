@@ -816,6 +816,7 @@ body {
   height: 400px;
   border-radius: 10px;
   background: var(--app-bg);
+  z-index: 100;
 }
 .white .media-preview #close-media {
   position: absolute;
