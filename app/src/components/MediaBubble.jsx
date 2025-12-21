@@ -1,29 +1,87 @@
 import React from "react";
 import useChat from "../store/useChat";
+import useApp from "../store/useApp";
 
 const MediaBubble = ({ chat }) => {
     const { uploadProgress } = useChat();
-    console.log(chat.files);
-    console.log(uploadProgress);
+    const { previewMedia, api } = useApp();
+    console.log("Media - ", chat);
     return (
         <div className="message sent">
             <div className="sending-media">
-                {chat?.files?.length > 0 &&
+          {
+              chat?.files[0]?.src_url ? 
+               chat?.files?.length > 0 &&
                     chat?.files?.map((file, index) => {
+                        let ext = file?.filename.split(".").pop();
+                        let type = file?.type
+                        let src = "";
+                        if (type === "image") {
+                            src = file.src_url
+                        } else if (type === "video") {
+                            src = "/video.png";
+                        } else if (type === "audio") {
+                            src = "/audio.png";
+                        } else {
+                            src = "/file.png";
+                        }
                         return (
                             <div key={index} className="media-item">
-                                <img src="/boy.png" />
-                                <div className="overly">
-                                    {file.uploadId && (
-                                        <p>{uploadProgress[file.uploadId]}%</p>
-                                    )}
-                                </div>
+                                <img
+                                    onClick={() => {
+                                        previewMedia({
+                                            type: file.type,
+                                            url: file.src_url
+                                        });
+                                    }}
+                                    src={src}
+                                />
                             </div>
                         );
-                    })}
-                {chat.text}
-                <div className="message-time">10:34 AM</div>
+                    })
+                    : 
+                     chat?.files?.length > 0 &&
+                    chat?.files?.map((file, index) => {
+                        let ext = file?.file?.name.split(".").pop();
+                        let type = file?.file?.type.split("/")[0];
+                        let src = "";
+                        if (type === "image") {
+                            src = URL.createObjectURL(file.file);
+                        } else if (type === "video") {
+                            src = "/video.png";
+                        } else if (type === "audio") {
+                            src = "/audio.png";
+                        } else {
+                            src = "/file.png";
+                        }
+                        return (
+                            <div key={index} className="media-item">
+                                <img
+                                    onClick={() => {
+                                        previewMedia({
+                                            type: file.file.type.split("/")[0],
+                                            url: `${api}/${file.uploadId}.${ext}`
+                                        });
+                                    }}
+                                    src={src}
+                                />
+                                {uploadProgress[file.uploadId] < 100 && (
+                                    <div className="overly">
+                                        {file.uploadId && (
+                                            <p>
+                                                {uploadProgress[file.uploadId]}%
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })
+          }
+               
             </div>
+            {chat.text}
+            <div className="message-time">10:34 AM</div>
         </div>
     );
 };

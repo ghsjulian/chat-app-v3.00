@@ -4,9 +4,9 @@ require("dotenv").config();
 require("express-async-error");
 const express = require("express");
 const http = require("node:http");
+const path = require("node:path");
 const helmet = require("helmet");
 const cors = require("cors");
-const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 
 const config = require("./configs");
@@ -29,32 +29,10 @@ app.use(
         credentials: true
     })
 );
+
 app.use(cookieParser());
-app.use(express.json({ limit: config.BODY_LIMIT }));
-app.use(express.urlencoded({ extended: true, limit: config.BODY_LIMIT }));
-app.use(express.raw({
-    type: "application/octet-stream",
-    limit: "1025mb"
-}));
-
-
-
-app.use(
-    morgan((tokens, req, res) => {
-        const info = {
-            remoteAddr: tokens["remote-addr"](req, res),
-            method: tokens.method(req, res),
-            url: tokens.url(req, res),
-            status: Number(tokens.status(req, res)),
-            responseTimeMs: Number(tokens["response-time"](req, res)),
-            contentLength: tokens.res(req, res, "content-length"),
-            requestId: req.id
-        };
-        console.log("access : ", info);
-        //return JSON.stringify(info);
-    })
-);
-
+//app.use(express.json({ limit: config.BODY_LIMIT }));
+//app.use(express.urlencoded({ extended: true, limit: config.BODY_LIMIT }));
 
 // lightweight health/readiness
 app.get("/health", (req, res) =>
@@ -72,19 +50,15 @@ app.get("/ready", (req, res) => {
 
 /*-----------------------------------------------------------------------------------------------*/
 /*---------> API ENDPOINTS <--------*/
+const isAuth = require("./middlewares/is-auth")
+app.use(
+    "/uploads",isAuth,
+    express.static(path.join("uploads"))
+);
 app.use("/api/auth", require("./routes/auth.routes"));
 app.use("/api/chats", require("./routes/chats.routes"));
 
-
 /*-----------------------------------------------------------------------------------------------*/
-/*
-app.use(express.json({ limit: config.BODY_LIMIT }));
-app.use(express.urlencoded({ extended: true, limit: config.BODY_LIMIT }));
-app.use(express.raw({
-    type: "application/octet-stream",
-    limit: "1025mb"
-}));
-*/
 // 404
 app.use((req, res) =>
     res.status(404).json({ error: "Not Found", requestId: req.id })

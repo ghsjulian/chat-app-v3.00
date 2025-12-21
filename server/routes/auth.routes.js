@@ -1,4 +1,5 @@
-const router = require("express").Router();
+const express = require("express");
+const router = express.Router();
 const authSignupController = require("../auth-controllers/auth-signup.controller");
 const authLoginController = require("../auth-controllers/auth-login.controller");
 const verifyOTPController = require("../auth-controllers/auth-otp-verify.controller");
@@ -7,16 +8,20 @@ const logoutController = require("../auth-controllers/auth-logout.controller");
 const settingsController = require("../auth-controllers/auth-settings.controller");
 const resetPasswordController = require("../auth-controllers/reset-password.controller");
 const deleteAccount = require("../auth-controllers/auth-delete-account.controller");
-const isAuth = require("../middlewares/is-auth")
+const isAuth = require("../middlewares/is-auth");
 
+router.use(express.json({
+        type: "application/json",
+        limit: "1025mb"
+    }))
 
 router.post("/signup", authSignupController);
 router.post("/login", authLoginController);
-router.post("/verify-otp",isAuth, verifyOTPController);
-router.post("/resend-otp", isAuth,resendOTPController);
-router.post("/logout", isAuth,logoutController);
-router.post("/reset-password", isAuth,resetPasswordController);
-router.put("/save-settings", isAuth,settingsController);
-router.delete("/delete-account", isAuth,deleteAccount);
+router.post("/verify-otp", isAuth, verifyOTPController);
+router.post("/resend-otp", isAuth, resendOTPController);
+router.post("/logout", isAuth, logoutController);
+router.post("/reset-password", isAuth, resetPasswordController);
+router.put("/save-settings", isAuth, settingsController);
+router.delete("/delete-account", isAuth, deleteAccount);
 
 module.exports = router;

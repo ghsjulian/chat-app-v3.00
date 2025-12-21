@@ -5,8 +5,13 @@ const sendMessage = async (req, res) => {
     try {
         const sender = req.user._id;
         const { id } = req.query;
+        const { text, files } = req.body;
 
-        console.log(req.body)
+        if (text === "" && files?.length == 0)
+            return res.status(403).json({
+                success: false,
+                message: "Message and files required"
+            });
 
         const user = await userModel
             .findById(id)
@@ -17,16 +22,16 @@ const sendMessage = async (req, res) => {
                 .json({ success: false, message: "No user found" });
 
         const newMessage = await new messageModel({
-            text: "",
-            files: [],
+            text: text ? text : "",
+            files,
             sender: sender,
             receiver: id
         });
-
+        await newMessage.save()
         return res.status(200).json({
             success: true,
             newMessage,
-            message: "Route is okay "
+            message: "Message sent successfully"
         });
     } catch (error) {
         console.log(error.message);

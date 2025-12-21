@@ -3,13 +3,13 @@ import { useLocation, useParams } from "react-router-dom";
 import Footer from "../layouts/Footer";
 import MessageBubble from "../components/MessageBubble";
 import MediaBubble from "../components/MediaBubble";
+import RenderFile from "../components/RenderFile";
 import useChat from "../store/useChat";
 import useApp from "../store/useApp";
-import PreviewMedia from "../components/PreviewMedia";
 
 const Chats = () => {
     const { getChat, chats } = useChat();
-    const { path } = useApp();
+    const { path, closeMedia, isMediaOpen } = useApp();
     const { id } = useParams();
 
     useEffect(() => {
@@ -31,39 +31,16 @@ const Chats = () => {
                             );
                         })}
 
-                    <div className="message sent">
-                        <div className="sending-media">
-                            <div className="media-item">
-                                <img src="/boy.png" />
-                                <div className="overly">
-                                    <p>100%</p>
-                                </div>
-                            </div>
-                            <div className="media-item">
-                                <img src="/video.png" />
-                                <div className="overly">
-                                    <p>100%</p>
-                                </div>
-                            </div>
-
-                            <div className="media-item">
-                                <img src="/audio.png" />
-                                <div className="overly">
-                                    <p>100%</p>
-                                </div>
-                            </div>
-                            <div className="media-item">
-                                <img src="/file.png" />
-                                <div className="overly">
-                                    <p>100%</p>
-                                </div>
-                            </div>
-                        </div>
-                        Yeah! How have you been?
-                        <div className="message-time">10:34 AM</div>
+</div>
+                {/*Preview Media*/}
+                {isMediaOpen && (
+                    <div className="media-preview">
+                        <button onClick={closeMedia} id="close-media">
+                            x
+                        </button>
+                        <RenderFile />
                     </div>
-                </div>
-                 <PreviewMedia />
+                )}
             </content>
             <Footer />
         </>

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import axios from "../libs/axios";
 import useAuth from "./useAuth";
+import useApp from "./useApp";
 
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 const MAX_RETRY = 3;
@@ -18,8 +19,9 @@ const useChat = create((set, get) => ({
         try {
             const response = await axios("/chats/get-chats?id=" + id);
             if (response?.data?.success) {
-                set({ selectedChat: response?.data?.user });
-                console.log(response?.data);
+                set({ selectedChat: response?.data?.user,
+                    chats : response?.data?.messages
+                });
             }
         } catch (error) {
             console.log(error.message);
@@ -102,8 +104,12 @@ const useChat = create((set, get) => ({
         }
 
         return {
-            uploadId,
-            name: file.name,
+            id: uploadId,
+            type: file.type.split("/")[0],
+            filename: `${uploadId}.${file.name.split(".").pop()}`,
+            src_url: `${useApp.getState().api}/${uploadId}.${file.name
+                .split(".")
+                .pop()}`,
             size: file.size
         };
     },
@@ -112,9 +118,9 @@ const useChat = create((set, get) => ({
         try {
             set({ isSendingMessage: true });
             let uploadedFiles = [];
-             const newMessage = {
-                sender: 1 ,// useAuth.getState().user._id,
-                receiver: 3,// get().selectedChat._id,
+            const newMessage = {
+                sender: 1, // useAuth.getState().user._id,
+                receiver: 3, // get().selectedChat._id,
                 text,
                 files
             };
@@ -135,9 +141,6 @@ const useChat = create((set, get) => ({
                     files: uploadedFiles
                 }
             );
-
-           
-            console.log(get().chats);
         } catch (err) {
             console.error(err.message);
         } finally {

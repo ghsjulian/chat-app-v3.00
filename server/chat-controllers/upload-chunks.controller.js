@@ -99,8 +99,9 @@ const uploadChunks = async (req, res) => {
                     success: true,
                     merged: true,
                     file: {
-                        name: filename,
-                        path: `/uploads/${uploadid}-${filename}`
+                        name: uploadid+path.extname(filename),
+                        ext : path.extname(filename),
+                        path: `/uploads/${uploadid}${path.extname(filename)}`
                     }
                 });
             });
