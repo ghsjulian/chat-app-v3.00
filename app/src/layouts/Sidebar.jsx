@@ -52,7 +52,7 @@ const Sidebar = () => {
                 ) : (
                     chatUsers?.length > 0 &&
                     chatUsers?.map((user, index) => {
-                        return <User key={index} user={user} />;
+                        return <User key={index} chatUser={user} />;
                     })
                 )}
                 {chatUsers?.length === 0 && !isLoadingUsers && <NoUser/>}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import Footer from "../layouts/Footer";
 import MessageBubble from "../components/MessageBubble";
@@ -6,26 +6,30 @@ import MediaBubble from "../components/MediaBubble";
 import RenderFile from "../components/RenderFile";
 import useChat from "../store/useChat";
 import useApp from "../store/useApp";
-import ChatsSkeleton from "../skeletons/ChatsSkeleton"
+import ChatsSkeleton from "../skeletons/ChatsSkeleton";
 
 const Chats = () => {
     const { getChat, chats, isFetchingChats } = useChat();
     const { path, closeMedia, isMediaOpen } = useApp();
     const { id } = useParams();
+    const chatBox = useRef(null);
 
     useEffect(() => {
         const isChat = path.split("/")[1];
         getChat(id);
-        if (isFetchingChats) return;
+        chatBox.current.scrollTo({
+            top: chatBox.current.scrollHeight,
+            behavior: "auto"
+        });
     }, [path, id]);
 
     return (
         <>
             <div className="chatbox">
-                <div className="messages">
-                    {isFetchingChats ?
-                     <ChatsSkeleton/>
-                    :
+                <div ref={chatBox} className="messages">
+                    {isFetchingChats ? (
+                        <ChatsSkeleton />
+                    ) : (
                         chats?.length > 0 &&
                         chats.map((message, index) => {
                             return message?.files?.length > 0 ? (
@@ -34,7 +38,7 @@ const Chats = () => {
                                 <MessageBubble key={index} chat={message} />
                             );
                         })
-                    }
+                    )}
                 </div>
                 {isMediaOpen && (
                     <div className="media-preview">

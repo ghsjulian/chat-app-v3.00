@@ -724,7 +724,7 @@ body {
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
     padding-top: 0.5rem;
     padding-bottom: 2rem;
 }

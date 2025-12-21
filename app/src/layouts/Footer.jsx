@@ -47,10 +47,10 @@ const Footer = () => {
         if (!text.trim() && files.length === 0) return;
         if (isSendingMessage) return;
 
+        if (textRef.current) textRef.current.focus();
         await sendMessage(files, text.trim());
         setText("");
         setFiles([]);
-        if (textRef.current) textRef.current.focus();
     };
 
     return (

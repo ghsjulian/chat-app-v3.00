@@ -662,7 +662,7 @@ body::-webkit-scrollbar,
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
     padding-top: 0.5rem;
     padding-bottom: 2rem;
 }
@@ -754,7 +754,7 @@ body::-webkit-scrollbar,
     right: 0;
     top: 0;
     bottom: 0;
-    background: rgba(14,26,31,0.501);
+    background: rgba(14, 26, 31, 0.501);
     display: flex;
     justify-content: center;
     align-items: center;
