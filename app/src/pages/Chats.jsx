@@ -6,33 +6,36 @@ import MediaBubble from "../components/MediaBubble";
 import RenderFile from "../components/RenderFile";
 import useChat from "../store/useChat";
 import useApp from "../store/useApp";
+import ChatsSkeleton from "../skeletons/ChatsSkeleton"
 
 const Chats = () => {
-    const { getChat, chats } = useChat();
+    const { getChat, chats, isFetchingChats } = useChat();
     const { path, closeMedia, isMediaOpen } = useApp();
     const { id } = useParams();
 
     useEffect(() => {
         const isChat = path.split("/")[1];
         getChat(id);
+        if (isFetchingChats) return;
     }, [path, id]);
 
     return (
         <>
-            <content className="chatbox">
+            <div className="chatbox">
                 <div className="messages">
-                    {/*All the chats will be render*/}
-                    {chats?.length > 0 &&
+                    {isFetchingChats ?
+                     <ChatsSkeleton/>
+                    :
+                        chats?.length > 0 &&
                         chats.map((message, index) => {
                             return message?.files?.length > 0 ? (
                                 <MediaBubble key={index} chat={message} />
                             ) : (
                                 <MessageBubble key={index} chat={message} />
                             );
-                        })}
-
-</div>
-                {/*Preview Media*/}
+                        })
+                    }
+                </div>
                 {isMediaOpen && (
                     <div className="media-preview">
                         <button onClick={closeMedia} id="close-media">
@@ -41,7 +44,7 @@ const Chats = () => {
                         <RenderFile />
                     </div>
                 )}
-            </content>
+            </div>
             <Footer />
         </>
     );

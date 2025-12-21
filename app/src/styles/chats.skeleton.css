@@ -1,0 +1,31 @@
+/* .messages {
+    flex: 1;
+    padding: 20px;
+    overflow: hidden;
+    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=")
+        repeat;
+    background-size: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+} */
+.msg {
+    max-width: 60%;
+    padding: 25px 16px;
+    border-radius: 20px;
+    animation: pulse 1.5s infinite;
+}
+.sk-received {
+    align-self: flex-start;
+    background: #b9b9b9b3;
+}
+.sk-sent {
+    align-self: flex-end;
+    background: #949494a0;
+}
+.msg.sk-received {
+    border-bottom-left-radius: 4px;
+}
+.msg.sk-sent {
+    border-bottom-right-radius: 4px;
+}

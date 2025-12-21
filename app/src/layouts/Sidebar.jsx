@@ -15,12 +15,13 @@ const Sidebar = () => {
         path
         
     } = useApp();
-    const {isLoadingUsers,renderUsers,chatUsers} = useChat()
+    const {isLoadingUsers,getChatUsers,renderUsers,chatUsers} = useChat()
     const location = useLocation();
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState("");
     useEffect(() => {
         setPath(location.pathname);
+        getChatUsers()
     }, [location]);
 
     return (

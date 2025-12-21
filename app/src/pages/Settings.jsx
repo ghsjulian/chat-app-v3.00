@@ -111,7 +111,7 @@ const Settings = () => {
     <div ref={areaRef} className="settings">
       <div className="settings-head">
         <span id="back" onClick={() => history.back()}>
-          <IoArrowBackCircleOutline size={28} />
+          <IoArrowBackCircleOutline size={36} />
         </span>
         <h3>Chat Settings</h3>
       </div>

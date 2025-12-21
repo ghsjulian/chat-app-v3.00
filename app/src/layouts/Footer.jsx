@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { GrAttachment } from "react-icons/gr";
 import { MdSend } from "react-icons/md";
+import { FaPlus } from "react-icons/fa";
 import axios from "axios";
 //import { v4 as uuidv4 } from "uuid";
 import useChat from "../store/useChat";
@@ -73,7 +74,6 @@ const Footer = () => {
                                     &times;
                                 </button>
                                 <div className="av">{ext}</div>
-                                <div className="progress">{f?.progress}%</div>
                             </div>
                         );
                     })}
@@ -82,7 +82,7 @@ const Footer = () => {
 
             <div className="input-wrapper">
                 <label htmlFor="files">
-                    <GrAttachment size={24} />
+                    <FaPlus size={30} />
                 </label>
 
                 <input
@@ -111,7 +111,7 @@ const Footer = () => {
 
                 <MdSend
                     onClick={handleSend}
-                    size={24}
+                    size={38}
                     style={{ cursor: "pointer" }}
                 />
             </div>

@@ -15,6 +15,9 @@ const useChat = create((set, get) => ({
     uploadProgress: {},
 
     getChat: async id => {
+        set({ selectedChat: null,
+                    chats : []
+                });
         set({ isFetchingChats: true });
         try {
             const response = await axios("/chats/get-chats?id=" + id);
@@ -27,6 +30,21 @@ const useChat = create((set, get) => ({
             console.log(error.message);
         } finally {
             set({ isFetchingChats: false });
+        }
+    },
+    getChatUsers: async ( ) => {
+        set({ isLoadingUsers: true });
+        try {
+            const response = await axios.get(
+                `/chats/get-chat-users?term=${""}&limit=10`
+            );
+            if (response?.data?.success) {
+                set({ chatUsers: response?.data?.users });
+            }
+        } catch (error) {
+            console.log(error.message);
+        } finally {
+            set({ isLoadingUsers: false });
         }
     },
     renderUsers: async (term, filter = {}) => {
@@ -119,8 +137,8 @@ const useChat = create((set, get) => ({
             set({ isSendingMessage: true });
             let uploadedFiles = [];
             const newMessage = {
-                sender: 1, // useAuth.getState().user._id,
-                receiver: 3, // get().selectedChat._id,
+                sender: useAuth.getState().user._id,
+                receiver:  get().selectedChat._id,
                 text,
                 files
             };

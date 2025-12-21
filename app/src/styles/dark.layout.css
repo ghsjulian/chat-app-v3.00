@@ -827,17 +827,26 @@ body::-webkit-scrollbar,
 }
 .dark .media-preview #close-media {
     position: absolute;
-    right: 5px;
-    top: 0;
+    right: 1px;
+    top: -3px;
     padding: 0.5rem;
     outline: none;
     border: none;
-    background: transparent;
     cursor: pointer;
     font-size: 20px;
     font-weight: 800;
     z-index: 5;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: rgb(247, 18, 0);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
+
 /* Accessibility: contrast fallback for dark text on light bg */
 @media (prefers-contrast: high) {
     .dark .message.received {

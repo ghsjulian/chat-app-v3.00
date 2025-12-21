@@ -1,22 +1,16 @@
 import React from "react";
+import useAuth from "../store/useAuth";
 
 const MessageBubble = ({ chat }) => {
+    const { user } = useAuth();
+    const isSender = user?._id === chat?.sender;
+
     return (
         <>
-            <div className="message sent">
+            <div className={`message ${isSender ? "sent" : "received"}`}>
                 {chat?.text}
                 <div className="message-time">10:34 AM</div>
             </div>
-            {/*
-      <div className="message received">
-        Hey! Long time no see
-        <div className="message-time">10:32 AM</div>
-      </div>
-      <div className="message sent">
-        Yeah! How have you been?
-        <div className="message-time">10:34 AM</div>
-      </div>
-      */}
         </>
     );
 };

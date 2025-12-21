@@ -15,7 +15,11 @@ const createSocket = require("./socket");
 const app = express();
 
 if (config.TRUST_PROXY) app.set("trust proxy", 1);
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }
+  })
+);
 app.use(
     cors({
         origin: config.CORS_ORIGIN || "*",

@@ -1,16 +1,16 @@
 import React from "react";
 import { IoArrowBackCircleOutline } from "react-icons/io5";
-import useApp from "../store/useApp";
+import useChat from "../store/useChat";
 
 const Header = () => {
-    const { toggleMenu } = useApp();
+    const { selectedChat } = useChat();
     return (
         <header className="chat-header">
             <span id="back" onClick={() => history.back()}>
-                <IoArrowBackCircleOutline size={28} />
+                <IoArrowBackCircleOutline size={36} />
             </span>
             <div className="user">
-                <img src="/boy.png" />
+                <img src={selectedChat?.avatar?.img_url || "/boy.png"} />
                 {/*
                 <div className="user-name">
                     <span>Ghs Julian</span>

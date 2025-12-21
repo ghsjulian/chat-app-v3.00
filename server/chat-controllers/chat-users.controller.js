@@ -17,8 +17,8 @@ const chatUsersController = async (req, res) => {
                     { email: { $regex: term, $options: "i" } }
                 ]
             })
-            .select("name email avatar")
-            .limit(Number(limit));
+                .select("name email avatar")
+                .limit(Number(limit));
 
             return res.status(200).json({
                 success: true,
@@ -48,7 +48,7 @@ const chatUsersController = async (req, res) => {
                         ]
                     },
                     text: 1,
-                    createdAt: 1
+                    createdAt: -1
                 }
             },
             { $sort: { createdAt: -1 } },
@@ -71,7 +71,9 @@ const chatUsersController = async (req, res) => {
 
         // Merge last message info
         const usersWithChatData = users.map(user => {
-            const chat = chats.find(c => c._id.toString() === user._id.toString());
+            const chat = chats.find(
+                c => c._id.toString() === user._id.toString()
+            );
             return {
                 ...user,
                 lastMessage: chat?.lastMessage || "",
@@ -83,7 +85,6 @@ const chatUsersController = async (req, res) => {
             success: true,
             users: usersWithChatData
         });
-
     } catch (error) {
         console.error("Chat users error:", error);
         return res.status(500).json({
