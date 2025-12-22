@@ -725,8 +725,8 @@ body {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
     scroll-behavior: auto;
-    padding-top: 0.5rem;
-    padding-bottom: 2rem;
+    padding-top: 1rem;
+    padding-bottom: 4rem;
 }
 
 /* Message bubble base */

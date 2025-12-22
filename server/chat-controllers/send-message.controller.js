@@ -27,7 +27,7 @@ const sendMessage = async (req, res) => {
             sender: sender,
             receiver: id
         });
-        await newMessage.save()
+         await newMessage.save()
         return res.status(200).json({
             success: true,
             newMessage,

@@ -9,7 +9,7 @@ const User = ({ chatUser }) => {
     const isMe = user?._id === chatUser.sender;
 
     return (
-        <NavLink onClick={toggleMenu} className="" to={`/chats/${user?._id}`}>
+        <NavLink onClick={toggleMenu} className="" to={`/chats/${chatUser?._id}`}>
             <div className="left">
                 <div className="user-img">
                     <img src={chatUser?.avatar?.img_url || "/boy.png"} />

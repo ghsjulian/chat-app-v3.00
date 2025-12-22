@@ -26,7 +26,7 @@ const getChats = async (req, res) => {
                 ]
             })
             .sort({ createdAt: -1 }) // newest first
-            .limit(10)
+            .limit(15)
             .lean();
         // 3. Reverse messages so frontend gets oldest → newest
         messages = messages.reverse();

@@ -2,29 +2,45 @@ import { create } from "zustand";
 import axios from "../libs/axios";
 import useAuth from "./useAuth";
 import useApp from "./useApp";
+import {
+    saveMessages,
+    getMessages,
+    mergeMessages,
+    updateMessagesById
+} from "../auth/indexDB";
 
+const SOCKET_SERVER = "http://localhost:3000";
+const MESSAGES_PER_PAGE = 15;
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 const MAX_RETRY = 3;
 const useChat = create((set, get) => ({
     selectedChat: null,
     chatUsers: [],
     chats: [],
+    inboxUsers: [],
+    uploadProgress: {},
     isLoadingUsers: false,
     isFetchingChats: false,
     isSendingMessage: false,
-    uploadProgress: {},
 
     getChat: async id => {
-        set({ selectedChat: null,
-                    chats : []
-                });
+        set({ selectedChat: null, chats: [] });
         set({ isFetchingChats: true });
+        const localMessages = await getMessages(id);
+        const last15 = localMessages.slice(-MESSAGES_PER_PAGE);
+        set({ chats: last15, hasMore: true });
+
         try {
             const response = await axios("/chats/get-chats?id=" + id);
             if (response?.data?.success) {
-                set({ selectedChat: response?.data?.user,
-                    chats : response?.data?.messages
+                set({
+                    selectedChat: response?.data?.user
                 });
+                const chats = response?.data?.messages;
+                await updateMessagesById(id, chats);
+                const updatedLocal = await getMessages(id);
+                set({ chats: updatedLocal });
+                console.log("Local DB - ", updatedLocal);
             }
         } catch (error) {
             console.log(error.message);
@@ -32,14 +48,21 @@ const useChat = create((set, get) => ({
             set({ isFetchingChats: false });
         }
     },
-    getChatUsers: async ( ) => {
+    getChatUsers: async () => {
+        let cachesUsers =
+            JSON.parse(localStorage.getItem("inbox-user")) || null;
+        set({ chatUsers: cachesUsers });
         set({ isLoadingUsers: true });
         try {
             const response = await axios.get(
-                `/chats/get-chat-users?term=${""}&limit=10`
+                `/chats/get-chat-users?term=${""}&limit=15`
             );
             if (response?.data?.success) {
                 set({ chatUsers: response?.data?.users });
+                localStorage.setItem(
+                    "inbox-user",
+                    JSON.stringify(response?.data?.users)
+                );
             }
         } catch (error) {
             console.log(error.message);
@@ -48,13 +71,20 @@ const useChat = create((set, get) => ({
         }
     },
     renderUsers: async (term, filter = {}) => {
-        set({ isLoadingUsers: true });
+        set({ isLoadingUsers: true, chatUsers: null });
+
         try {
             const response = await axios.get(
-                `/chats/get-chat-users?term=${term}&limit=10`
+                `/chats/get-chat-users?term=${term}&limit=15`
             );
             if (response?.data?.success) {
                 set({ chatUsers: response?.data?.users });
+                if (term === "") {
+                    localStorage.setItem(
+                        "inbox-user",
+                        JSON.stringify(response?.data?.users)
+                    );
+                }
             }
         } catch (error) {
             console.log(error.message);
@@ -138,7 +168,7 @@ const useChat = create((set, get) => ({
             let uploadedFiles = [];
             const newMessage = {
                 sender: useAuth.getState().user._id,
-                receiver:  get().selectedChat._id,
+                receiver: get().selectedChat._id,
                 text,
                 files
             };
@@ -152,13 +182,19 @@ const useChat = create((set, get) => ({
                 );
             }
 
-            await axios.post(
+            const response = await axios.post(
                 `/chats/send-message?id=${get().selectedChat._id}`,
                 {
                     text,
                     files: uploadedFiles
                 }
             );
+            if (response?.data?.success) {
+                await saveMessages(get().selectedChat._id, response?.data?.newMessage);
+                const updatedLocal = await getMessages(get().selectedChat._id);
+                set({ chats: updatedLocal });
+                console.log("Totally - ", updatedLocal);
+            }
         } catch (err) {
             console.error(err.message);
         } finally {

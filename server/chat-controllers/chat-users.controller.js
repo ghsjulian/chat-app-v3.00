@@ -4,11 +4,11 @@ const User = require("../models/user.model");
 
 const chatUsersController = async (req, res) => {
     try {
-        const currentUserId = req.user.id;
-        const { term, limit = 10 } = req.query;
+        const currentUserId = req.user._id.toString();
+        const { term, limit = 15 } = req.query;
 
         // ==================================================
-        // CASE 1: SEARCH USERS
+        // CASE 1: SEARCH USERS (exclude logged-in user)
         // ==================================================
         if (term && term.trim() !== "") {
             const users = await User.find({
@@ -29,41 +29,41 @@ const chatUsersController = async (req, res) => {
         }
 
         // ==================================================
-        // CASE 2: RECENT CHATS (FIND + SORT + MAP)
+        // CASE 2: RECENT CHATS (WhatsApp style)
         // ==================================================
 
-        // 1️⃣ get all messages of current user (newest first)
+        // 1️⃣ Get all messages where current user is sender or receiver
         const messages = await Message.find({
             $or: [{ sender: currentUserId }, { receiver: currentUserId }]
-        })
-            .sort({ createdAt: -1 }) // newest message first
+        }).limit(limit)
+            .sort({ createdAt: -1 }) // newest first
             .lean();
 
-        // 2️⃣ Map to store latest message per user
+        // 2️⃣ Store latest message per chat user
         const chatsMap = new Map();
 
         for (const msg of messages) {
-            // find other user in this message
-            const chatUserId =
+            // find the OTHER user (never current user)
+            const otherUserId =
                 msg.sender.toString() === currentUserId
                     ? msg.receiver.toString()
                     : msg.sender.toString();
 
-            // if already added, skip (we already have newest)
-            if (chatsMap.has(chatUserId)) continue;
+            // skip if already added (we already have newest message)
+            if (chatsMap.has(otherUserId)) continue;
 
-            // store latest message for this user
-            chatsMap.set(chatUserId, {
-                sender: msg.sender.toString(),
-                lastMessage: msg.text || `Sent ${msg?.files?.length} files`,
+            chatsMap.set(otherUserId, {
+                sender : msg.sender,
+                lastMessage:
+                    msg.text || `Sent ${msg?.files?.length || 0} files`,
                 lastMessageAt: msg.createdAt
             });
 
-            // stop if limit reached
+            // stop when limit reached
             if (chatsMap.size >= Number(limit)) break;
         }
 
-        // if no chats
+        // if no chats found
         if (chatsMap.size === 0) {
             return res.status(200).json({
                 success: true,
@@ -72,30 +72,42 @@ const chatUsersController = async (req, res) => {
         }
 
         // ==================================================
-        // FETCH USER DETAILS
+        // FETCH CHAT USERS (exclude current user)
         // ==================================================
-        const userIds = Array.from(chatsMap.keys());
+        const chatUserIds = Array.from(chatsMap.keys());
 
-        const users = await User.find({ _id: { $in: userIds } })
+        const users = await User.find({
+            _id: { $in: chatUserIds }
+        })
             .select("name email avatar")
             .lean();
 
         // ==================================================
-        // MERGE USER + CHAT DATA (KEEP ORDER)
+        // MERGE USER DATA + LAST MESSAGE (KEEP ORDER)
         // ==================================================
-        const result = userIds.map(userId => ({
-            ...users.find(u => u._id.toString() === userId),
-            sender: chatsMap.get(userId).sender,
-            lastMessage: chatsMap.get(userId).lastMessage,
-            lastMessageAt: chatsMap.get(userId).lastMessageAt
-        }));
+        const result = chatUserIds.map(userId => {
+            const user = users.find(u => u._id.toString() === userId);
+
+            return {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                avatar: user.avatar,
+                sender: chatsMap.get(userId).sender,
+                lastMessage: chatsMap.get(userId).lastMessage,
+                lastMessageAt: chatsMap.get(userId).lastMessageAt
+            };
+        });
 
         // ==================================================
         // FINAL RESPONSE
         // ==================================================
+        const filteredResult = result.filter(
+    user => user._id.toString() !== currentUserId
+);
         res.status(200).json({
             success: true,
-            users: result
+            users: filteredResult
         });
     } catch (error) {
         console.error("chatUsersController error:", error);

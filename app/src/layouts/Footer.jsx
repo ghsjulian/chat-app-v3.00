@@ -106,7 +106,7 @@ const Footer = () => {
                     value={text}
                     type="text"
                     className="message-input"
-                    placeholder="Aa"
+                    placeholder="Aa : Type Message..."
                 />
 
                 <MdSend

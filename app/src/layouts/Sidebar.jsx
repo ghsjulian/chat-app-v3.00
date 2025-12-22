@@ -47,7 +47,7 @@ const Sidebar = () => {
                 </div>
             </div>
             <div className="users-list">
-                {isLoadingUsers ? (
+                {isLoadingUsers && chatUsers === null ? (
                     <InboxSkeleton />
                 ) : (
                     chatUsers?.length > 0 &&
