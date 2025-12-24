@@ -9,19 +9,14 @@ import InboxSkeleton from "../skeletons/InboxSkeleton";
 import NoUser from "../components/NoUser";
 
 const Sidebar = () => {
-    const {
-        isMenuActive,
-        setPath,
-        path
-        
-    } = useApp();
-    const {isLoadingUsers,getChatUsers,renderUsers,chatUsers} = useChat()
+    const { isMenuActive, setPath, path } = useApp();
+    const { isLoadingUsers, getChatUsers, renderUsers, chatUsers } = useChat();
     const location = useLocation();
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState("");
     useEffect(() => {
         setPath(location.pathname);
-        getChatUsers()
+        getChatUsers();
     }, [location]);
 
     return (
@@ -55,7 +50,7 @@ const Sidebar = () => {
                         return <User key={index} chatUser={user} />;
                     })
                 )}
-                {chatUsers?.length === 0 && !isLoadingUsers && <NoUser/>}
+                {chatUsers?.length === 0 && !isLoadingUsers && <NoUser />}
             </div>
         </aside>
     );

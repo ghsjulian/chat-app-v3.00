@@ -2,17 +2,15 @@
 "use strict";
 require("dotenv").config();
 require("express-async-error");
-const express = require("express");
-const http = require("node:http");
+
 const path = require("node:path");
 const helmet = require("helmet");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-
 const config = require("./configs");
 const { connectDB, isConnected } = require("./db/mongoose");
-const createSocket = require("./socket");
-const app = express();
+const {express,app,IO,server} = require("./socket");
+
 
 if (config.TRUST_PROXY) app.set("trust proxy", 1);
 app.use(
@@ -35,10 +33,7 @@ app.use(
 );
 
 app.use(cookieParser());
-//app.use(express.json({ limit: config.BODY_LIMIT }));
-//app.use(express.urlencoded({ extended: true, limit: config.BODY_LIMIT }));
 
-// lightweight health/readiness
 app.get("/health", (req, res) =>
     res.json({
         status: "OK",
@@ -60,7 +55,7 @@ app.use(
     express.static(path.join("uploads"))
 );
 app.use("/api/auth", require("./routes/auth.routes"));
-app.use("/api/chats", require("./routes/chats.routes"));
+app.use("/api/chats", require("./routes/chats-v2.routes"));
 
 /*-----------------------------------------------------------------------------------------------*/
 // 404
@@ -70,14 +65,6 @@ app.use((req, res) =>
 
 /*-----------------------------------------------------------------------------------------------*/
 // create server and attach socket.io
-const server = http.createServer(app);
-let connections = new Set();
-const io = createSocket(server, config);
-
-server.on("connection", socket => {
-    connections.add(socket);
-    socket.on("close", () => connections.delete(socket));
-});
 
 // Start sequence: connect DB -> start server
 const start = async () => {
@@ -104,4 +91,4 @@ start().catch(error => {
 });
 
 // for testing
-module.exports = { app, server, io };
+module.exports = { app, server };

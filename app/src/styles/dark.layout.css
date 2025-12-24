@@ -510,6 +510,7 @@ body::-webkit-scrollbar,
     justify-content: space-between;
     align-items: center;
     padding: 0 0.5rem;
+    gap: 5px;
 }
 .dark .footer .input-wrapper input {
     outline: none;
@@ -518,8 +519,8 @@ body::-webkit-scrollbar,
     background: transparent;
     font-weight: 700;
     color: var(--white);
-    padding: 0.6rem 1rem;
-    border-radius: 15px;
+    padding: 0.8rem 1rem;
+    border-radius: 20px;
 }
 /* Sidebar internals (kept your rules with minor cleanup) */
 .dark .sidebar .side-top {
@@ -545,7 +546,7 @@ body::-webkit-scrollbar,
 .dark .side-top .search {
     margin-top: 2px;
     border: 1px solid var(--dark-border);
-    border-radius: 15px;
+    border-radius: 20px;
     padding: 0.2rem 0.3rem;
 }
 .dark .side-top .search input {
@@ -554,7 +555,7 @@ body::-webkit-scrollbar,
     border: none;
     background: transparent;
     color: var(--dark-border);
-    padding: 0.2rem 0.5rem;
+    padding: 0.5rem 1rem;
 }
 .dark .sidebar .users-list {
     width: 100%;
@@ -587,8 +588,9 @@ body::-webkit-scrollbar,
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 0.7rem;
     padding: 0.3rem 0;
+    border-bottom: 2px solid #232d2d;
 }
 .dark .users-list a .left {
     display: flex;
@@ -599,8 +601,8 @@ body::-webkit-scrollbar,
     position: relative;
 }
 .dark .users-list a .left .user-img img {
-    width: 50px;
-    height: 50px;
+    width: 55px;
+    height: 55px;
     object-fit: cover;
     border-radius: 50%;
     border: 2px solid var(--dark-border);
@@ -621,18 +623,18 @@ body::-webkit-scrollbar,
     flex-direction: column;
     justify-content: space-between;
     align-items: left;
-    gap: 4px;
-    margin-left: 2px;
+    gap: 3px;
+    margin-left: 4px;
 }
 .dark .left .name span {
     color: var(--blue);
     font-weight: 700;
-    font-size: 17px;
+    font-size: 15px;
 }
 .dark .left .name p {
     color: var(--unread-msg);
     font-weight: 500;
-    font-size: 15px;
+    font-size: 14px;
     width: 150px;
     white-space: nowrap;
     overflow: hidden;
@@ -663,10 +665,34 @@ body::-webkit-scrollbar,
     overflow-y: auto;
     -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
     scroll-behavior: auto;
-    padding-top: .8rem;
+    padding-top: 0.8rem;
     padding-bottom: 4rem;
 }
-
+.dark .loading-msg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1.5rem 0;
+    padding: 1rem;
+}
+.dark .loading-msg .loading {
+    width: 33px;
+    height: 33px;
+    border-radius: 50%;
+    background: transparent;
+    border-left: 3.5px solid transparent;
+    border-right: 3.5px solid #f9ffff;
+    border-top: 3.5px solid #f9ffff;
+    border-bottom: 3.5px solid #f9ffff;
+    margin: 0 auto;
+    animation: spinner 0.7s linear infinite;
+    z-index: 90;
+}
 /* Message bubble base */
 .dark .message {
     display: inline-block;

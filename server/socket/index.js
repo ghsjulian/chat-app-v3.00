@@ -1,65 +1,116 @@
-"use strict";
-/**ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
- * - Create and configure a Socket.IO server
- * - Example namespace and basic events (connect, join, message, disconnect)
- */
-
 const { Server } = require("socket.io");
+const express = require("express");
+const app = express();
+const http = require("node:http");
+const server = http.createServer(app);
+const config = require("../configs/index");
 
-module.exports = function createSocket(server, config) {
-  const io = new Server(server, {
+const IO = new Server(server, {
     path: "/socket.io",
     cors: {
-      origin: config.CORS_ORIGIN || "*",
-      methods: ["GET", "POST"],
-      credentials: true,
+        origin: config.CORS_ORIGIN || "*",
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        credentials: true
     },
     pingTimeout: 30000,
-    maxHttpBufferSize: 1e6, // limit message size to 1MB
-  });
-  io.use((socket, next) => {
+    maxHttpBufferSize: 1e6 // limit message size to 1MB
+});
+
+IO.use((socket, next) => {
     try {
-      const token =
-        socket.handshake.auth?.token || socket.handshake.query?.token;
-      socket.user = token ? { id: token } : null;
-      return next();
+        const token =
+            socket.handshake.auth?.token || socket.handshake.query?.token;
+        socket.user = token ? { id: token } : null;
+        return next();
     } catch (error) {
-      console.log("\n[!] Socket auth failed", { error });
-      return next(new Error("Authentication error"));
+        console.log("\n[!] Socket authentication failed", { error });
+        return next(new Error("Authentication error"));
     }
+});
+
+IO.on("connection", socket => {
+    console.log("\n[+] Socket connected", {
+        id: socket.id,
+        user: socket.user
+    });
+
+    socket.on("disconnect", reason => {
+        console.log("Socket disconnected", { id: socket.id, reason });
+    });
+});
+
+module.exports = {express,app,IO,server}
+
+/*
+/* ================================
+   SOCKET CONNECTION
+================================ */
+/*
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.userId);
+
+  // personal room (IMPORTANT)
+  socket.join(socket.userId.toString());
+
+  /* ================================
+     INIT CHAT (1 to 1)
+  ================================ */
+/*
+socket.on("chat:init", async (receiverId, cb) => {
+    let chat = await Chat.findOne({
+        participants: { $all: [socket.userId, receiverId] }
+    });
+
+    if (!chat) {
+        chat = await Chat.create({
+            participants: [socket.userId, receiverId]
+        });
+    }
+
+    socket.join(chat._id.toString());
+    cb(chat);
+});
+
+/* ================================
+     SEND MESSAGE
+  ================================ */
+/*
+  socket.on("message:send", async ({ chatId, receiverId, text }) => {
+
+    const message = await Message.create({
+      chatId,
+      senderId: socket.userId,
+      receiverId,
+      text
+    });
+
+    await Chat.findByIdAndUpdate(chatId, {
+      lastMessage: message._id
+    });
+
+    // send to chat room
+    io.to(chatId).emit("message:new", message);
+
+    // notify receiver (even if chat closed)
+    io.to(receiverId.toString()).emit("message:notify", message);
   });
 
-  io.on("connection", (socket) => {
-    console.log("\n[+] Socket connected", { id: socket.id, user: socket.user });
+  /* ================================
+     MESSAGE SEEN
+  ================================ */
+/*
+  socket.on("message:seen", async (chatId) => {
 
-    socket.on("joinRoom", (room, cb) => {
-      try {
-        if (!room) return cb?.({ ok: false, error: "Room required" });
-        socket.join(room);
-        console.log("Socket joined room", { socketId: socket.id, room });
-        cb?.({ ok: true });
-      } catch (err) {
-        console.log("joinRoom error", { err });
-        cb?.({ ok: false, error: err.message });
-      }
-    });
-    socket.on("roomMessage", (payload, cb) => {
-      try {
-        const { room, message } = payload || {};
-        if (!room || !message)
-          return cb?.({ ok: false, error: "room & message required" });
-        const out = { from: socket.id, message, ts: Date.now() };
-        socket.to(room).emit("roomMessage", out);
-        cb?.({ ok: true });
-      } catch (err) {
-        console.log("roomMessage error", { err });
-        cb?.({ ok: false, error: err.message });
-      }
-    });
-    // ping/pong or heartbeat can be handled by socket.io itself
-    socket.on("disconnect", (reason) => {
-      console.log("Socket disconnected", { id: socket.id, reason });
-    });
+    await Message.updateMany(
+      { chatId, receiverId: socket.userId, seen: false },
+      { seen: true }
+    );
+
+    socket.to(chatId).emit("message:seen", socket.userId);
   });
-  return io;
-};
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.userId);
+  });
+});
+*/

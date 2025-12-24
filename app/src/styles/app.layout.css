@@ -585,8 +585,8 @@ body {
     background: transparent;
     font-weight: 700;
     color: var(--time);
-    padding: 0.6rem 1rem;
-    border-radius: 15px;
+    padding: 0.8rem 1rem;
+    border-radius: 20px;
 }
 /* Sidebar internals (kept your rules with minor cleanup) */
 .white .sidebar .side-top {
@@ -609,8 +609,8 @@ body {
 .white .side-top .search {
     margin-top: 2px;
     border: 2px solid var(--text);
-    border-radius: 15px;
-    padding: 0.2rem 0.3rem;
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
 }
 .white .side-top .search input {
     width: 100%;
@@ -649,8 +649,9 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 0.7rem;
     padding: 0.3rem 0;
+    border-bottom: 2px solid #e9efef;
 }
 .white .users-list a .left {
     display: flex;
@@ -661,8 +662,8 @@ body {
     position: relative;
 }
 .white .users-list a .left .user-img img {
-    width: 50px;
-    height: 50px;
+    width: 55px;
+    height: 55px;
     object-fit: cover;
     border-radius: 50%;
     border: 2px solid var(--text);
@@ -683,18 +684,18 @@ body {
     flex-direction: column;
     justify-content: space-between;
     align-items: left;
-    gap: 4px;
-    margin-left: 2px;
+    gap: 3px;
+    margin-left: 4px;
 }
 .white .left .name span {
     color: var(--blue);
     font-weight: 700;
-    font-size: 17px;
+    font-size: 16px;
 }
 .white .left .name p {
     color: var(--unread-msg);
     font-weight: 500;
-    font-size: 15px;
+    font-size: 14px;
     width: 150px;
     white-space: nowrap;
     overflow: hidden;
@@ -728,7 +729,31 @@ body {
     padding-top: 1rem;
     padding-bottom: 4rem;
 }
-
+.white .loading-msg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1.5rem 0;
+    padding: 1rem;
+}
+.white .loading-msg .loading {
+    width: 33px;
+    height: 33px;
+    border-radius: 50%;
+    background: transparent;
+    border-left: 3.5px solid transparent;
+    border-right: 3.5px solid currentColor;
+    border-top: 3.5px solid currentColor;
+    border-bottom: 3.5px solid currentColor;
+    margin: 0 auto;
+    animation: spinner 0.7s linear infinite;
+    z-index: 90;
+}
 /* Message bubble base */
 .white .message {
     display: inline-block;
@@ -964,5 +989,17 @@ body {
     }
     .white .settings .area .row input {
         width: 90%;
+    }
+}
+@keyframes spinner {
+    from {
+        border-bottom: 2.5px solid #1dffd5;
+        transform: rotate(0deg);
+        opacity: 0.7;
+    }
+    to {
+        transform: rotate(360deg);
+        border-bottom: 2.5px solid currentColor;
+        opacity: 1;
     }
 }

@@ -2,6 +2,7 @@ import { create } from "zustand";
 import axios from "../libs/axios";
 import useAuth from "./useAuth";
 import useApp from "./useApp";
+import { io } from "socket.io-client";
 import {
     saveMessages,
     getMessages,
@@ -22,8 +23,38 @@ const useChat = create((set, get) => ({
     isLoadingUsers: false,
     isFetchingChats: false,
     isSendingMessage: false,
+    loadingMore: false,
+    hasMore: false,
+    socket: null,
 
-    getChat: async id => {
+    createSocket: () => {
+        if (get().socket !== null) return;
+        const newSocket = io("http://localhost:3000", {
+            auth: { token: useAuth.getState().user }
+        });
+        set({ socket: newSocket });
+        /*
+// start chat
+socket.emit("chat:init", { receiverId }, (chat) => {
+  setChat(chat);
+});
+
+// send message
+socket.emit("message:send", {
+  chatId,
+  receiverId,
+  text: "Hello"
+});
+
+// receive message
+socket.on("message:new", (msg) => {
+  setMessages(prev => [...prev, msg]);
+});
+*/
+    },
+
+    getChat: async (id, chatid) => {
+        if (!id) return;
         set({ selectedChat: null, chats: [] });
         set({ isFetchingChats: true });
         const localMessages = await getMessages(id);
@@ -31,7 +62,9 @@ const useChat = create((set, get) => ({
         set({ chats: last15, hasMore: true });
 
         try {
-            const response = await axios("/chats/get-chats?id=" + id);
+            const response = await axios.get(
+                `/chats/get-chats?id=${id}&chatid=${chatid}`
+            );
             if (response?.data?.success) {
                 set({
                     selectedChat: response?.data?.user
@@ -40,7 +73,6 @@ const useChat = create((set, get) => ({
                 await updateMessagesById(id, chats);
                 const updatedLocal = await getMessages(id);
                 set({ chats: updatedLocal });
-                console.log("Local DB - ", updatedLocal);
             }
         } catch (error) {
             console.log(error.message);
@@ -53,6 +85,7 @@ const useChat = create((set, get) => ({
             JSON.parse(localStorage.getItem("inbox-user")) || null;
         set({ chatUsers: cachesUsers });
         set({ isLoadingUsers: true });
+        get().createSocket();
         try {
             const response = await axios.get(
                 `/chats/get-chat-users?term=${""}&limit=15`
@@ -166,11 +199,13 @@ const useChat = create((set, get) => ({
         try {
             set({ isSendingMessage: true });
             let uploadedFiles = [];
+
             const newMessage = {
                 sender: useAuth.getState().user._id,
                 receiver: get().selectedChat._id,
                 text,
-                files
+                files,
+                createdAt: Date.now()
             };
             set({
                 chats: [...get().chats, newMessage]
@@ -181,24 +216,59 @@ const useChat = create((set, get) => ({
                     files.map(fileObj => get().uploadFileChunks(fileObj))
                 );
             }
-
             const response = await axios.post(
-                `/chats/send-message?id=${get().selectedChat._id}`,
+                `/chats/send-message?id=${get().selectedChat._id}&chatid=${
+                    get().selectedChat.chatid
+                }`,
                 {
                     text,
                     files: uploadedFiles
                 }
             );
             if (response?.data?.success) {
-                await saveMessages(get().selectedChat._id, response?.data?.newMessage);
-                const updatedLocal = await getMessages(get().selectedChat._id);
-                set({ chats: updatedLocal });
-                console.log("Totally - ", updatedLocal);
+                await saveMessages(
+                    get().selectedChat.chatid,
+                    response?.data?.newMessage
+                );
+                const updatedLocal = await getMessages(
+                    get().selectedChat.chatid
+                );
+                //set({ chats: updatedLocal });
             }
         } catch (err) {
             console.error(err.message);
         } finally {
             set({ isSendingMessage: false });
+        }
+    },
+    loadMoreMessages: async receiverId => {
+        const { chats, loadingMore, hasMore } = get();
+        if (loadingMore || !hasMore) return;
+        if (get().selectedChat === null) return;
+
+        set({ loadingMore: true });
+        try {
+            const oldestTime = chats[0]?.createdAt;
+            const response = await axios.get(
+                `/chats/load-older-messages?chatid=${
+                    get()?.selectedChat?.chatid
+                }&before=${oldestTime}`
+            );
+            if (response?.data?.success && response.data.messages.length > 0) {
+                set({
+                    chats: [...response.data.messages, ...chats],
+                    hasMore:
+                        response.data.messages.length === MESSAGES_PER_PAGE,
+                    loadingMore: false
+                });
+            } else {
+                set({ hasMore: false, loadingMore: false });
+            }
+        } catch (error) {
+            console.error("Error loading older messages:", error);
+            set({ loadingMore: false });
+        } finally {
+            set({ loadingMore: false, hasMore: false });
         }
     }
 }));

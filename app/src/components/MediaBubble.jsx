@@ -2,12 +2,15 @@ import React from "react";
 import useChat from "../store/useChat";
 import useApp from "../store/useApp";
 import useAuth from "../store/useAuth";
+import timeAgo from "../auth/formatter";
+
 
 const MediaBubble = ({ chat }) => {
     const { uploadProgress } = useChat();
     const { previewMedia, api } = useApp();
     const { user } = useAuth();
-    const isSender = user?._id === chat?.sender;
+    const isSender =
+        user?._id === chat?.sender?._id ? chat?.sender?._id : chat?.sender;
 
 
     return (
@@ -88,7 +91,7 @@ const MediaBubble = ({ chat }) => {
                       })}
             </div>
             {chat.text}
-            <div className="message-time">10:34 AM</div>
+            <div className="message-time">{timeAgo(chat.createdAt)}</div>
         </div>
     );
 };

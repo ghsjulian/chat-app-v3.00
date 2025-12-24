@@ -46,11 +46,13 @@ const Footer = () => {
     const handleSend = async () => {
         if (!text.trim() && files.length === 0) return;
         if (isSendingMessage) return;
+        let trimdText = text.trim()
+        let finalFiles = files
 
-        if (textRef.current) textRef.current.focus();
-        await sendMessage(files, text.trim());
         setText("");
         setFiles([]);
+        if (textRef.current) textRef.current.focus();
+        await sendMessage(files, trimdText);
     };
 
     return (
@@ -82,7 +84,7 @@ const Footer = () => {
 
             <div className="input-wrapper">
                 <label htmlFor="files">
-                    <FaPlus size={30} />
+                    <FaPlus size={27} />
                 </label>
 
                 <input
@@ -111,7 +113,7 @@ const Footer = () => {
 
                 <MdSend
                     onClick={handleSend}
-                    size={38}
+                    size={36}
                     style={{ cursor: "pointer" }}
                 />
             </div>

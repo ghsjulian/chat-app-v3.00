@@ -25,7 +25,7 @@ const App = () => {
           element={user && user._id ? <Layouts /> : <Navigate to="/login" />}
         >
           <Route index element={<Home />} />
-          <Route path="/chats/:id" element={<Chats />} />
+          <Route path="/chats" element={<Chats />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
         <Route

@@ -2,14 +2,19 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import useApp from "../store/useApp";
 import useAuth from "../store/useAuth";
+import timeAgo from "../auth/formatter";
 
 const User = ({ chatUser }) => {
     const { toggleMenu } = useApp();
     const { user } = useAuth();
-    const isMe = user?._id === chatUser.sender;
+    const isMe = user?._id === chatUser?.sender?._id ? chatUser?.sender?._id : chatUser?._id;
 
     return (
-        <NavLink onClick={toggleMenu} className="" to={`/chats/${chatUser?._id}`}>
+        <NavLink
+            onClick={toggleMenu}
+            className=""
+            to={`/chats?id=${chatUser?._id}&chatid=${chatUser?.chatId}`}
+        >
             <div className="left">
                 <div className="user-img">
                     <img src={chatUser?.avatar?.img_url || "/boy.png"} />
@@ -26,7 +31,7 @@ const User = ({ chatUser }) => {
                 </div>
             </div>
             <div className="right">
-                {chatUser?.lastMessage && <time>12:45 PM</time>}
+                {chatUser?.lastMessage && <time>{timeAgo(chatUser.time)}</time>}
             </div>
         </NavLink>
     );

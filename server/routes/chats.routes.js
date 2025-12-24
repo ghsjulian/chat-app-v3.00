@@ -5,6 +5,7 @@ const chatUsersController = require("../chat-controllers/chat-users.controller")
 const getChats = require("../chat-controllers/get-chats.controller");
 const sendMessage = require("../chat-controllers/send-message.controller");
 const uploadChunks = require("../chat-controllers/upload-chunks.controller");
+const loadOlderMessages = require("../chat-controllers/load-messages.controller");
 
 router.get(
     "/get-chat-users",
@@ -23,6 +24,11 @@ router.post(
     "/upload-chunks",
     isAuth,
     uploadChunks
+);
+router.get(
+    "/load-older-messages",
+    isAuth,
+    loadOlderMessages
 );
 
 module.exports = router;
