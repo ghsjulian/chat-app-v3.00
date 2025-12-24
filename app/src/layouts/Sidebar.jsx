@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { IoSearchOutline } from "react-icons/io5";
 import { IoSettingsOutline } from "react-icons/io5";
@@ -10,7 +10,16 @@ import NoUser from "../components/NoUser";
 
 const Sidebar = () => {
     const { isMenuActive, setPath, path } = useApp();
-    const { isLoadingUsers, getChatUsers, renderUsers, chatUsers } = useChat();
+    const {
+        isLoadingUsers,
+        getChatUsers,
+        renderUsers,
+        chatUsers,
+        loadMoreUsers,
+        loadingMoreUsers,
+        hasMoreUsers
+    } = useChat();
+    const listRef = useRef(null);
     const location = useLocation();
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState("");
@@ -18,6 +27,21 @@ const Sidebar = () => {
         setPath(location.pathname);
         getChatUsers();
     }, [location]);
+    
+    const handleScroll = useCallback(async () => {
+        const list = listRef.current;
+        if (!list || !hasMoreUsers || loadingMoreUsers) return;
+
+        if (list.scrollTop < 30) {
+            const prevHeight = list.scrollHeight;
+            await loadMoreUsers();
+
+            requestAnimationFrame(() => {
+                const newHeight = box.scrollHeight;
+                list.scrollTop = newHeight - prevHeight;
+            });
+        }
+    }, [loadMoreUsers, hasMoreUsers, loadingMoreUsers]);
 
     return (
         <aside className={path === "/" ? "sidebar active-menu" : "sidebar"}>
@@ -41,7 +65,7 @@ const Sidebar = () => {
                     <IoSearchOutline size={24} />
                 </div>
             </div>
-            <div className="users-list">
+            <div ref={listRef} onScroll={handleScroll} className="users-list">
                 {isLoadingUsers && chatUsers === null ? (
                     <InboxSkeleton />
                 ) : (

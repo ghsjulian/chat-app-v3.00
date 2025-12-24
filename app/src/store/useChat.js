@@ -25,6 +25,8 @@ const useChat = create((set, get) => ({
     isSendingMessage: false,
     loadingMore: false,
     hasMore: false,
+    loadingMoreUsers: false,
+    hasMoreUsers: false,
     socket: null,
 
     createSocket: () => {
@@ -57,7 +59,7 @@ socket.on("message:new", (msg) => {
         if (!id) return;
         set({ selectedChat: null, chats: [] });
         set({ isFetchingChats: true });
-        const localMessages = await getMessages(id);
+        const localMessages = await getMessages(chatid);
         const last15 = localMessages.slice(-MESSAGES_PER_PAGE);
         set({ chats: last15, hasMore: true });
 
@@ -70,9 +72,12 @@ socket.on("message:new", (msg) => {
                     selectedChat: response?.data?.user
                 });
                 const chats = response?.data?.messages;
-                await updateMessagesById(id, chats);
-                const updatedLocal = await getMessages(id);
+                await updateMessagesById(response?.data?.user?.chatid, chats);
+                const updatedLocal = await getMessages(
+                    response?.data?.user?.chatid
+                );
                 set({ chats: updatedLocal });
+                console.log("GET ALL CHATS : ", updatedLocal);
             }
         } catch (error) {
             console.log(error.message);
@@ -201,7 +206,9 @@ socket.on("message:new", (msg) => {
             let uploadedFiles = [];
 
             const newMessage = {
-                sender: useAuth.getState().user._id,
+                sender: {
+                    _id: useAuth.getState().user._id
+                },
                 receiver: get().selectedChat._id,
                 text,
                 files,
@@ -233,7 +240,8 @@ socket.on("message:new", (msg) => {
                 const updatedLocal = await getMessages(
                     get().selectedChat.chatid
                 );
-                //set({ chats: updatedLocal });
+                // set({ chats: updatedLocal });
+                console.log("NEW SENT MESSAGE - ", updatedLocal);
             }
         } catch (err) {
             console.error(err.message);
@@ -269,6 +277,25 @@ socket.on("message:new", (msg) => {
             set({ loadingMore: false });
         } finally {
             set({ loadingMore: false, hasMore: false });
+        }
+    },
+    loadMoreUsers: async receiverId => {
+        const { chatUsers, loadingMoreUsers, hasMoreUsers } = get();
+        if (loadingMoreUsers || !hasMoreUsers) return;
+
+        set({ loadingMoreUsers: true });
+        try {
+            const usersLen = chatUsers?.length;
+            const oldestTime = chatUsers[usersLen]?.createdAt;
+            const response = await axios.get(
+                `/chats/get-old-chat-users?next=${oldestTime}`
+            );
+            console.log("MORE LOADING USERS : ", response.data);
+        } catch (error) {
+            console.error("Error loading older messages:", error);
+            set({ loadingMoreUsers: false });
+        } finally {
+            set({ loadingMoreUsers: false, hasMoreUsers: false });
         }
     }
 }));

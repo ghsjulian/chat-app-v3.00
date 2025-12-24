@@ -9,8 +9,7 @@ const MediaBubble = ({ chat }) => {
     const { uploadProgress } = useChat();
     const { previewMedia, api } = useApp();
     const { user } = useAuth();
-    const isSender =
-        user?._id === chat?.sender?._id ? chat?.sender?._id : chat?.sender;
+    const isSender = user?._id === chat?.sender?._id;
 
 
     return (

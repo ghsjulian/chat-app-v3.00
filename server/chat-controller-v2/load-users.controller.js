@@ -4,43 +4,25 @@ const User = require("../models/user.model");
 // ===============================
 // Find Users / Recent Chats (WhatsApp style)
 // ===============================
-const findUsers = async (req, res) => {
+const loadUsers = async (req, res) => {
     try {
         const currentUserId = req.user._id;
-        const { term } = req.query;
+        const { next } = req.query;
 
         // =====================================================
-        // CASE 1: SEARCH USERS (when term exists)
-        // =====================================================
-        if (term) {
-            const regex = new RegExp(term, "i");
-
-            const users = await User.find({
-                _id: { $ne: currentUserId },
-                name: regex
-            })
-                .select("name avatar")
-                .limit(15);
-
-            return res.status(200).json({
-                type: "search",
-                success:true,
-                users
-            });
-        }
-
-        // =====================================================
-        // CASE 2: RECENT CHATS (when term does NOT exist)
+        // When next is present
         // =====================================================
         const chats = await Chat.find({
-            participants: currentUserId
+            participants: currentUserId,
+            createdAt: { $lt: new Date(next) }
         })
             .populate("participants", "name avatar")
             .populate({
                 path: "lastMessage",
                 select: "text createdAt"
             })
-            .sort({ updatedAt: -1 }).limit(15); // newest first
+            .sort({ updatedAt: -1 })
+            .limit(15); // newest first
 
         const recentChats = chats.map(chat => {
             const otherUser = chat.participants.find(
@@ -60,13 +42,16 @@ const findUsers = async (req, res) => {
 
         return res.status(200).json({
             type: "recent",
-            success : true,
+            success: true,
             users: recentChats
         });
     } catch (error) {
         console.error("Find users error:", error);
-        res.status(500).json({success :false,message: "Something went wrong" });
+        res.status(500).json({
+            success: false,
+            message: "Something went wrong"
+        });
     }
 };
 
-module.exports = findUsers;
+module.exports = loadUsers;

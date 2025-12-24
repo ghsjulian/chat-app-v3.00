@@ -7,6 +7,7 @@ import RenderFile from "../components/RenderFile";
 import useChat from "../store/useChat";
 import useApp from "../store/useApp";
 import ChatsSkeleton from "../skeletons/ChatsSkeleton";
+import NoChats from "../components/NoChats";
 
 const Chats = () => {
     const {
@@ -15,7 +16,8 @@ const Chats = () => {
         isFetchingChats,
         loadMoreMessages,
         hasMore,
-        loadingMore
+        loadingMore,
+        selectedChat
     } = useChat();
 
     const { closeMedia, isMediaOpen } = useApp();
@@ -38,6 +40,7 @@ const Chats = () => {
     /* ===============================
        SCROLL TO BOTTOM ON FIRST LOAD
     =============================== */
+    /*
     useEffect(() => {
         if (!containerRef.current || chats.length === 0) return;
 
@@ -46,7 +49,7 @@ const Chats = () => {
             isInitialLoad.current = false;
         }
     }, [chats]);
-
+*/
     /* ===============================
        LOAD OLD MESSAGES ON TOP SCROLL
     =============================== */
@@ -75,14 +78,11 @@ const Chats = () => {
         const isNearBottom =
             box.scrollHeight - box.scrollTop - box.clientHeight < 120;
 
-        if (isNearBottom) {
-            bottomRef.current?.scrollIntoView();
-        }
+        // if (isNearBottom) {
+        //             bottomRef.current?.scrollIntoView();
+        //         }
         bottomRef.current?.scrollIntoView();
     }, [chats]);
-
-
-
 
     return (
         <>
@@ -92,6 +92,9 @@ const Chats = () => {
                     className="messages"
                     onScroll={handleScroll}
                 >
+                    {!isFetchingChats && chats?.length == 0 && (
+                        <NoChats chat={selectedChat} />
+                    )}
                     {loadingMore && (
                         <div className="loading-msg">
                             <div className="loading"></div>

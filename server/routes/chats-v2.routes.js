@@ -7,6 +7,7 @@ const uploadChunks = require("../chat-controller-v2/upload-chunks.controller");
 const sendMessage = require("../chat-controller-v2/send-message.controller");
 const getMessages = require("../chat-controller-v2/get-messages.controller");
 const loadOlderMessages = require("../chat-controller-v2/load-older-message.controller");
+const loadOlderUsers = require("../chat-controller-v2/load-users.controller");
 
 router.get(
     "/get-chat-users",
@@ -30,6 +31,11 @@ router.get(
     "/load-older-messages",
     isAuth,
     loadOlderMessages
+);
+router.get(
+    "/get-old-chat-users",
+    isAuth,
+    loadOlderUsers
 );
 
 

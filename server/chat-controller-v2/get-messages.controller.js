@@ -7,7 +7,8 @@ const User = require("../models/user.model");
 const getMessages = async (req, res) => {
     try {
         const { chatid, id } = req.query;
-        let user, messages;
+        let user;
+        let messages = [];
 
         if (!id) {
             return res
@@ -27,7 +28,9 @@ const getMessages = async (req, res) => {
                 .sort({ createdAt: -1 }) // newest first
                 .limit(15)
                 .populate("sender", "name avatar")
-                .populate("receiver", "name avatar");
+                .populate("receiver", "name avatar")
+        
+        messages.reverse();
         }
 
         let finalUser = {
@@ -36,11 +39,11 @@ const getMessages = async (req, res) => {
             name: user.name,
             avatar: user.avatar
         };
-        let reverseMessages = messages.reverse()
+        
 
         return res
             .status(200)
-            .json({ success: true, user: finalUser, messages:reverseMessages });
+            .json({ success: true, user: finalUser, messages });
     } catch (error) {
         console.error("Get messages error:", error);
         res.status(500).json({ message: "Something went wrong" });
