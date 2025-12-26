@@ -20,7 +20,10 @@ IO.use((socket, next) => {
     try {
         const token =
             socket.handshake.auth?.token || socket.handshake.query?.token;
-        socket.user = token ? { id: token } : null;
+        socket.user = token ? token : null;
+        socket.userId = token._id;
+        socket.username = token.name;
+
         return next();
     } catch (error) {
         console.log("\n[!] Socket authentication failed", { error });
@@ -29,88 +32,110 @@ IO.use((socket, next) => {
 });
 
 IO.on("connection", socket => {
-    console.log("\n[+] Socket connected", {
-        id: socket.id,
-        user: socket.user
-    });
-
+    console.log(`\n[+] ${socket?.username} Connected\n`);
+    console.log(`[+] Connected ID - ${socket?.userId}\n`);
+    
+    // Join Personal Room 
+    socket.join(socket.userId);
+    // Notify online status
+    socket.broadcast.emit("user:online", socket.userId);
+    
+    
     socket.on("disconnect", reason => {
-        console.log("Socket disconnected", { id: socket.id, reason });
+        socket.broadcast.emit("user:offline", socket.userId);
+        console.log(`\n[!] ${socket?.username} Disconnected\n`);
+    console.log(`[!] Disconnected ID - ${socket?.userId}\n`);
     });
 });
 
-module.exports = {express,app,IO,server}
+module.exports = { express, app, IO, server };
 
-/*
-/* ================================
-   SOCKET CONNECTION
-================================ */
-/*
-io.on("connection", (socket) => {
-  console.log("User connected:", socket.userId);
+/* 
+const { Server } = require("socket.io");
+const http = require("http");
+const express = require("express");
+const jwt = require("jsonwebtoken");
+const config = require("../configs");
 
-  // personal room (IMPORTANT)
-  socket.join(socket.userId.toString());
+const app = express();
+const server = http.createServer(app);
 
-  /* ================================
-     INIT CHAT (1 to 1)
-  ================================ */
-/*
-socket.on("chat:init", async (receiverId, cb) => {
-    let chat = await Chat.findOne({
-        participants: { $all: [socket.userId, receiverId] }
-    });
+const io = new Server(server, {
+    path: "/socket.io",
+    cors: {
+        origin: config.CORS_ORIGIN || "*",
+        credentials: true
+    },
+    pingTimeout: 30000,
+    pingInterval: 10000,
+    maxHttpBufferSize: 1e6
+});
 
-    if (!chat) {
-        chat = await Chat.create({
-            participants: [socket.userId, receiverId]
-        });
+io.use((socket, next) => {
+    try {
+        const token = socket.handshake.auth?.token;
+        if (!token) return next(new Error("Unauthorized"));
+
+        const decoded = jwt.verify(token, config.JWT_SECRET);
+        socket.userId = decoded._id;
+        socket.username = decoded.name;
+
+        next();
+    } catch (err) {
+        next(new Error("Invalid token"));
     }
-
-    socket.join(chat._id.toString());
-    cb(chat);
 });
 
-/* ================================
-     SEND MESSAGE
-  ================================ */
-/*
-  socket.on("message:send", async ({ chatId, receiverId, text }) => {
+io.on("connection", socket => {
+    console.log(`[+] ${socket.username} connected`);
 
-    const message = await Message.create({
-      chatId,
-      senderId: socket.userId,
-      receiverId,
-      text
+    // Join personal room (WhatsApp style)
+    socket.join(socket.userId);
+
+    // Notify online status
+    socket.broadcast.emit("user:online", socket.userId);
+
+    socket.on("message:send", payload => {
+        const { to, message, tempId } = payload;
+
+        const msg = {
+            from: socket.userId,
+            to,
+            message,
+            tempId,
+            createdAt: new Date()
+        };
+
+        // send to receiver
+        io.to(to).emit("message:receive", msg);
+
+        // delivery acknowledgment
+        socket.emit("message:delivered", {
+            tempId,
+            deliveredAt: new Date()
+        });
     });
 
-    await Chat.findByIdAndUpdate(chatId, {
-      lastMessage: message._id
+    socket.on("typing:start", to => {
+        socket.to(to).emit("typing:start", socket.userId);
     });
 
-    // send to chat room
-    io.to(chatId).emit("message:new", message);
+    socket.on("typing:stop", to => {
+        socket.to(to).emit("typing:stop", socket.userId);
+    });
 
-    // notify receiver (even if chat closed)
-    io.to(receiverId.toString()).emit("message:notify", message);
-  });
+    socket.on("message:read", ({ from }) => {
+        io.to(from).emit("message:read", {
+            by: socket.userId,
+            at: new Date()
+        });
+    });
 
-  /* ================================
-     MESSAGE SEEN
-  ================================ */
-/*
-  socket.on("message:seen", async (chatId) => {
-
-    await Message.updateMany(
-      { chatId, receiverId: socket.userId, seen: false },
-      { seen: true }
-    );
-
-    socket.to(chatId).emit("message:seen", socket.userId);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.userId);
-  });
+    socket.on("disconnect", () => {
+        console.log(`[-] ${socket.username} disconnected`);
+        socket.broadcast.emit("user:offline", socket.userId);
+    });
 });
+
+module.exports = { app, server, io };
 */

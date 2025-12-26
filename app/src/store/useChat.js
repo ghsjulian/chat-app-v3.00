@@ -28,33 +28,48 @@ const useChat = create((set, get) => ({
     loadingMoreUsers: false,
     hasMoreUsers: false,
     socket: null,
+    connected: false,
 
     createSocket: () => {
-        if (get().socket !== null) return;
-        const newSocket = io("http://localhost:3000", {
-            auth: { token: useAuth.getState().user }
+        if (get().socket) return;
+        if (!useAuth.getState().user) return;
+
+        const token = useAuth.getState().user; // ✅ only token
+        const socket = io(SOCKET_SERVER, {
+            path: "/socket.io",
+            transports: ["websocket"], // WhatsApp style
+            autoConnect: false,
+            reconnection: true,
+            reconnectionAttempts: Infinity,
+            reconnectionDelay: 1000,
+            auth: { token }
         });
-        set({ socket: newSocket });
-        /*
-// start chat
-socket.emit("chat:init", { receiverId }, (chat) => {
-  setChat(chat);
-});
 
-// send message
-socket.emit("message:send", {
-  chatId,
-  receiverId,
-  text: "Hello"
-});
-
-// receive message
-socket.on("message:new", (msg) => {
-  setMessages(prev => [...prev, msg]);
-});
-*/
+        /* =======================
+           CORE EVENTS
+        ======================= */
+        socket.on("connect", () => {
+            console.log("✅ Socket connected:", socket.id);
+            set({ connected: true });
+        });
+        socket.on("disconnect", reason => {
+            console.log("❌ Socket disconnected:", reason);
+            set({ connected: false });
+        });
+        socket.on("connect_error", err => {
+            console.error("⚠️ Socket error:", err.message);
+        });
+        socket.connect(); // ✅ controlled connect
+        set({ socket });
     },
 
+    disconnectSocket: () => {
+        const socket = get().socket;
+        if (!socket) return;
+        socket.removeAllListeners();
+        socket.disconnect();
+        set({ socket: null, connected: false });
+    },
     getChat: async (id, chatid) => {
         if (!id) return;
         set({ selectedChat: null, chats: [] });
@@ -76,13 +91,13 @@ socket.on("message:new", (msg) => {
                 const updatedLocal = await getMessages(
                     response?.data?.user?.chatid
                 );
-                set({ chats: updatedLocal});
+                set({ chats: updatedLocal });
                 console.log("GET ALL CHATS : ", updatedLocal);
             }
         } catch (error) {
             console.log(error.message);
         } finally {
-            set({ isFetchingChats: false,hasMoreUsers: false  });
+            set({ isFetchingChats: false, hasMoreUsers: false });
         }
     },
     getChatUsers: async () => {
