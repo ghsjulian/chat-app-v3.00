@@ -76,13 +76,13 @@ socket.on("message:new", (msg) => {
                 const updatedLocal = await getMessages(
                     response?.data?.user?.chatid
                 );
-                set({ chats: updatedLocal });
+                set({ chats: updatedLocal});
                 console.log("GET ALL CHATS : ", updatedLocal);
             }
         } catch (error) {
             console.log(error.message);
         } finally {
-            set({ isFetchingChats: false });
+            set({ isFetchingChats: false,hasMoreUsers: false  });
         }
     },
     getChatUsers: async () => {
@@ -273,31 +273,72 @@ socket.on("message:new", (msg) => {
                 set({ hasMore: false, loadingMore: false });
             }
         } catch (error) {
-            console.error("Error loading older messages:", error);
             set({ loadingMore: false });
         } finally {
             set({ loadingMore: false, hasMore: false });
         }
     },
-    loadMoreUsers: async receiverId => {
+    loadMoreUsers: async () => {
         const { chatUsers, loadingMoreUsers, hasMoreUsers } = get();
-        if (loadingMoreUsers || !hasMoreUsers) return;
 
-        set({ loadingMoreUsers: true });
         try {
-            const usersLen = chatUsers?.length;
-            const oldestTime = chatUsers[usersLen]?.createdAt;
+            set({ loadingMoreUsers: true });
+            const oldestTime = chatUsers.at(-1)?.time;
             const response = await axios.get(
                 `/chats/get-old-chat-users?next=${oldestTime}`
             );
-            console.log("MORE LOADING USERS : ", response.data);
+            const newUsers = response?.data.users || [];
+            // const mergedUsers = [get().chatUsers, ...newUsers];
+            set(state => ({
+                chatUsers: [...state.chatUsers, ...newUsers],
+                hasMoreUsers: newUsers.length > 0
+            }));
+            const filteredUsers = [
+                ...new Map(get().chatUsers.map(i => [i._id, i])).values()
+            ];
+            set({ chatUsers: filteredUsers });
         } catch (error) {
-            console.error("Error loading older messages:", error);
-            set({ loadingMoreUsers: false });
+            console.log(error.message);
         } finally {
-            set({ loadingMoreUsers: false, hasMoreUsers: false });
+            set({ loadingMoreUsers: false });
         }
     }
 }));
 
 export default useChat;
+
+/*
+loadMoreUsers: async () => {
+    const { chatUsers, loadingMoreUsers, hasMoreUsers } = get();
+
+    // ✅ correct guard
+    if (loadingMoreUsers || !hasMoreUsers) return;
+
+    set({ loadingMoreUsers: true });
+
+    try {
+        if (!chatUsers || chatUsers.length === 0) {
+            set({ hasMoreUsers: false });
+            return;
+        }
+
+        const oldestTime = chatUsers.at(-1)?.createdAt;
+
+        const response = await axios.get(
+            `/chats/get-old-chat-users?next=${oldestTime}`
+        );
+
+        const newUsers = response.data || [];
+
+        console.log("MORE LOADING USERS:", newUsers);
+
+        set(state => ({
+            chatUsers: [...state.chatUsers, ...newUsers],
+            hasMoreUsers: newUsers.length > 0
+        }));
+    } catch (error) {
+        console.error("Error loading chat users:", error);
+    } finally {
+        set({ loadingMoreUsers: false });
+    }
+}*/

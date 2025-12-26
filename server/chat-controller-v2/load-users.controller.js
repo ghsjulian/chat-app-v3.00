@@ -8,13 +8,17 @@ const loadUsers = async (req, res) => {
     try {
         const currentUserId = req.user._id;
         const { next } = req.query;
-
+        if (!next || next === "")
+            return res.status(403).json({
+                success: false,
+                message: "Next user time required"
+            });
         // =====================================================
         // When next is present
         // =====================================================
         const chats = await Chat.find({
             participants: currentUserId,
-            createdAt: { $lt: new Date(next) }
+            updatedAt: { $lt: new Date(next) }
         })
             .populate("participants", "name avatar")
             .populate({
