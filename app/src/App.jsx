@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -17,6 +17,7 @@ import useAuth from "./store/useAuth";
 
 const App = () => {
   const { user } = useAuth();
+
   return (
     <Router>
       <Routes>
@@ -38,9 +39,7 @@ const App = () => {
         />
         <Route
           path="/verify-otp"
-          element={
-            user?.isVerified ? <Navigate to="/" /> : <VerifyOtp />
-          }
+          element={user?.isVerified ? <Navigate to="/" /> : <VerifyOtp />}
         />
         <Route
           path="/reset-password"
