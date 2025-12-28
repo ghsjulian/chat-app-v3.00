@@ -48,9 +48,8 @@ io.on("connection", (socket) => {
   /* =========================
      SEND MESSAGE
   ========================= */
-  socket.on("message:send", ({ to, message, tempId }) => {
+  socket.on("message:send", ({ to, message }) => {
     const payload = {
-      _id: tempId,
       from: socket.userId,
       to,
       message,
@@ -63,7 +62,6 @@ io.on("connection", (socket) => {
 
     // delivery ack
     socket.emit("message:delivered", {
-      tempId,
       deliveredAt: new Date(),
     });
   });

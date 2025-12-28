@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { io } from "socket.io-client";
 import useAuth from "./useAuth";
+import useChat from "./useChat";
 
 const SOCKET_SERVER = "http://localhost:3000";
 
@@ -47,9 +48,10 @@ const useSocket = create((set, get) => ({
        RECEIVE MESSAGE
     ======================= */
     socket.on("message:receive", (msg) => {
-      window.dispatchEvent(new CustomEvent("chat:message", { detail: msg }));
+      useChat.getState().mergeMessage(msg?.message);
+      // window.dispatchEvent(new CustomEvent("chat:message", { detail: msg }));
 
-      socket.emit("message:read", { from: msg.from });
+      // socket.emit("message:read", { from: msg.from });
     });
 
     /* =======================
@@ -94,14 +96,13 @@ const useSocket = create((set, get) => ({
     set({ socket: null, connected: false });
   },
 
-  sendMessage: (to, message, tempId) => {
+  sendMessage: (to, message) => {
     const socket = get().socket;
     if (!socket || !get().connected) return;
 
     socket.emit("message:send", {
       to,
       message,
-      tempId,
     });
   },
 

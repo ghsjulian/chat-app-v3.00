@@ -169,6 +169,7 @@ const useChat = create((set, get) => ({
 
   sendMessage: async (files, text) => {
     try {
+      const socketState = useSocket.getState();
       set({ isSendingMessage: true });
       let uploadedFiles = [];
 
@@ -184,8 +185,8 @@ const useChat = create((set, get) => ({
       set({
         chats: [...get().chats, newMessage],
       });
-      if(useSocket.getState().connected)){
-        useSocket.getState().sendMessage(get().selectedChat._id, newMessage, "123")
+      if (socketState.connected) {
+        socketState.sendMessage(get().selectedChat._id, newMessage);
       }
       if (files.length > 0) {
         uploadedFiles = await Promise.all(
@@ -268,6 +269,20 @@ const useChat = create((set, get) => ({
     } finally {
       set({ loadingMoreUsers: false });
     }
+  },
+  mergeMessage: (msg) => {
+    if (!msg) return;
+
+    set((state) => {
+      // prevent duplicates
+      if (state.chats.some((m) => m._id === msg._id)) {
+        return state;
+      }
+
+      return {
+        chats: [...state.chats, msg], // WhatsApp-style (new at bottom)
+      };
+    });
   },
 }));
 
