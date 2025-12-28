@@ -665,8 +665,10 @@ body {
   border-radius: 50%;
   right: 5px;
   bottom: 5px;
-  background: var(--online);
   border: 1px solid #ffffff;
+}
+.white .users-list a .left .user-img .online {
+  background: var(--online);
 }
 .white .users-list a .left .name {
   display: flex;

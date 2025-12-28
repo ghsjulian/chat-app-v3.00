@@ -1,9 +1,10 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoSearchOutline, IoSettingsOutline } from "react-icons/io5";
 
 import useApp from "../store/useApp";
 import useChat from "../store/useChat";
+import useSocket from "../store/useSocket";
 
 import User from "../components/User";
 import InboxSkeleton from "../skeletons/InboxSkeleton";
@@ -20,6 +21,7 @@ const Sidebar = () => {
     loadingMoreUsers,
     hasMoreUsers,
   } = useChat();
+  const { onlineUsers } = useSocket();
 
   const listRef = useRef(null);
   const location = useLocation();
@@ -33,7 +35,7 @@ const Sidebar = () => {
   useEffect(() => {
     setPath(location.pathname);
     getChatUsers();
-  }, [location.pathname]);
+  }, [location.pathname, onlineUsers]);
 
   /* ===============================
        Scroll DOWN to Load More

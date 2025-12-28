@@ -7,6 +7,7 @@ const SOCKET_SERVER = "http://localhost:3000";
 const useSocket = create((set, get) => ({
   socket: null,
   connected: false,
+  onlineUsers: [],
 
   createSocket: () => {
     if (get().socket) return;
@@ -26,6 +27,12 @@ const useSocket = create((set, get) => ({
     ======================= */
     socket.on("connect", () => {
       set({ connected: true });
+    });
+
+    socket.on("user:online", (userId) => {
+      set({
+        onlineUsers: [...get().onlineUsers, userId],
+      });
     });
 
     socket.on("disconnect", () => {
@@ -87,7 +94,7 @@ const useSocket = create((set, get) => ({
     set({ socket: null, connected: false });
   },
 
-  sendMessage: ({ to, message, tempId }) => {
+  sendMessage: (to, message, tempId) => {
     const socket = get().socket;
     if (!socket || !get().connected) return;
 

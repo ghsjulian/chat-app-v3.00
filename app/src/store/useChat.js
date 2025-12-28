@@ -2,6 +2,7 @@ import { create } from "zustand";
 import axios from "../libs/axios";
 import useAuth from "./useAuth";
 import useApp from "./useApp";
+import useSocket from "./useSocket";
 import { io } from "socket.io-client";
 import {
   saveMessages,
@@ -59,7 +60,6 @@ const useChat = create((set, get) => ({
     let cachesUsers = JSON.parse(localStorage.getItem("inbox-user")) || null;
     set({ chatUsers: cachesUsers });
     set({ isLoadingUsers: true });
-    get().createSocket();
     try {
       const response = await axios.get(
         `/chats/get-chat-users?term=${""}&limit=15`
@@ -184,6 +184,9 @@ const useChat = create((set, get) => ({
       set({
         chats: [...get().chats, newMessage],
       });
+      if(useSocket.getState().connected)){
+        useSocket.getState().sendMessage(get().selectedChat._id, newMessage, "123")
+      }
       if (files.length > 0) {
         uploadedFiles = await Promise.all(
           files.map((fileObj) => get().uploadFileChunks(fileObj))

@@ -14,9 +14,15 @@ import Login from "./pages/Login";
 import VerifyOtp from "./pages/VerifyOtp";
 import ResetPassword from "./pages/ResetPassword";
 import useAuth from "./store/useAuth";
+import useSocket from "./store/useSocket";
 
 const App = () => {
   const { user } = useAuth();
+  const { createSocket, connected } = useSocket();
+  useEffect(() => {
+    if (!user || connected) return;
+    createSocket();
+  }, [user, connected]);
 
   return (
     <Router>
