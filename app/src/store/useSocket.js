@@ -25,14 +25,23 @@ const useSocket = create((set, get) => ({
         socket.on("connect", () => {
             set({ connected: true });
         });
-        socket.on("user:online", userId => {
+        socket.on("users:online:list", users => {
             set({
-                onlineUsers: [...get().onlineUsers, userId]
+                onlineUsers: users
             });
-            console.log("ONLINE USERS : ", get().onlineUsers);
+            //console.log(users);
         });
-        socket.on("disconnect", () => {
-            set({ connected: false });
+
+        socket.on("user:offline", users => {
+            set({
+                onlineUsers: users
+            });
+            console.log(users);
+        });
+        socket.on("disconnect", users => {
+            set({
+                connected: false
+            });
             console.log("User Disconnected");
         });
         socket.on("connect_error", err => {
@@ -40,10 +49,9 @@ const useSocket = create((set, get) => ({
         });
 
         socket.on("message:receive", msg => {
+            const selectedChat = useChatStore.getState().selectedChat
             useChatStore.getState().mergeMessage(msg?.message);
-            // window.dispatchEvent(new CustomEvent("chat:message", { detail: msg }));
-
-            // socket.emit("message:read", { from: msg.from });
+           // socket.emit("message:read", { from: msg.from });
         });
         socket.on("message:delivered", data => {
             window.dispatchEvent(
@@ -51,9 +59,7 @@ const useSocket = create((set, get) => ({
             );
         });
         socket.on("message:read", data => {
-            window.dispatchEvent(
-                new CustomEvent("chat:read", { detail: data })
-            );
+            const selectedChat = useChatStore.getState().selectedChat
         });
         socket.on("typing:start", userId => {
             window.dispatchEvent(

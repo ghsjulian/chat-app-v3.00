@@ -22,9 +22,9 @@ const App = () => {
     useEffect(() => {
         if (!user || connected) return;
         createSocket();
-        return () => {
-            disconnectSocket();
-        };
+        // return () => {
+//             disconnectSocket();
+//         };
     }, [user, createSocket, onlineUsers]);
     
 

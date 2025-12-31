@@ -242,6 +242,10 @@ const useChatStore = create((set, get) => ({
             set({
                 currentChats: [...get().currentChats, newMessage]
             });
+            if (socketState.connected) {
+                socketState.sendMessage(get().selectedChat._id, newMessage);
+            }
+            return;
             if (files.length > 0) {
                 uploadedFiles = await Promise.all(
                     files.map(fileObj => get().uploadFileChunks(fileObj))
@@ -272,6 +276,12 @@ const useChatStore = create((set, get) => ({
         } finally {
             set({ isSendingMessage: false });
         }
+    },
+    mergeMessage : (message )=>{
+        set({
+            currentChats : [...get().currentChats,message]
+        })
+        console.log("MERG MESSAGE : ",get().currentChats)
     }
 }));
 

@@ -30,7 +30,7 @@ const Sidebar = () => {
     useEffect(() => {
         setPath(location.pathname);
         getChatUsers();
-    }, [location.pathname, onlineUsers]);
+    }, [location.pathname]);
     useEffect(() => {
         const list = listRef.current;
         const onScroll = async () => {
