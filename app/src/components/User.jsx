@@ -4,19 +4,24 @@ import useApp from "../store/useApp";
 import useAuth from "../store/useAuth";
 import timeAgo from "../auth/formatter";
 import useSocket from "../store/useSocket";
+import useChatStore from "../store/useChatStore";
 
 const User = ({ chatUser }) => {
   const { toggleMenu } = useApp();
   const { user } = useAuth();
   const { onlineUsers } = useSocket();
+  const { setSelectedChat } = useChatStore();
   const isMe =
     user?._id === chatUser?.sender?._id ? chatUser?.sender?._id : chatUser?._id;
 
   return (
     <NavLink
-      onClick={toggleMenu}
+      onClick={(e)=>{
+          toggleMenu()
+         setSelectedChat(chatUser)
+      }}
       className=""
-      to={`/chats?id=${chatUser?._id}&chatid=${chatUser?.chatId}`}
+      to="#"
     >
       <div className="left">
         <div className="user-img">

@@ -3,14 +3,15 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import ChatHeader from "./ChatHeader";
 import Footer from "./Footer";
+import Chatbox from "./Chatbox";
 import "../styles/app.layout.css";
 import "../styles/dark.layout.css";
-import useChat from "../store/useChat";
 import useApp from "../store/useApp";
+import useChatStore from "../store/useChatStore";
 
 const Layouts = () => {
-    const { selectedChat } = useChat();
     const { chatSettings, path } = useApp();
+    const { selectedChat } = useChatStore();
 
     useEffect(() => {
         if (document.body.hasAttribute("class")) {
@@ -30,7 +31,8 @@ const Layouts = () => {
             {/*-->Add a condition,
             if selected user then 
             show chat header<--*/}
-            {path !== "/" && path !== "/settings" && <ChatHeader />}
+            {selectedChat && selectedChat?._id && <><Chatbox/> <ChatHeader /></>}
+            
             <Outlet />
         </main>
     );

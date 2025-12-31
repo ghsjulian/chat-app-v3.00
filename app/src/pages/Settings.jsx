@@ -14,7 +14,7 @@ const Settings = () => {
     resendOtp,
     isResending,
   } = useAuth();
-  const { chatSettings, isSaving, saveSettings } = useApp();
+  const { chatSettings, isSaving, saveSettings ,toggleMenu} = useApp();
   const navigate = useNavigate();
   const msgRef = useRef(null);
   const areaRef = useRef(null);
@@ -110,7 +110,7 @@ const Settings = () => {
   return (
     <div ref={areaRef} className="settings">
       <div className="settings-head">
-        <span id="back" onClick={() => history.back()}>
+        <span id="back" onClick={() => {history.back(),toggleMenu()}}>
           <IoArrowBackCircleOutline size={36} />
         </span>
         <h3>Chat Settings</h3>

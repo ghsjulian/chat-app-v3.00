@@ -28,9 +28,9 @@ const getMessages = async (req, res) => {
                 .sort({ createdAt: -1 }) // newest first
                 .limit(15)
                 .populate("sender", "name avatar")
-                .populate("receiver", "name avatar")
-        
-        messages.reverse();
+                .populate("receiver", "name avatar");
+
+            messages.reverse();
         }
 
         let finalUser = {
@@ -39,7 +39,6 @@ const getMessages = async (req, res) => {
             name: user.name,
             avatar: user.avatar
         };
-        
 
         return res
             .status(200)

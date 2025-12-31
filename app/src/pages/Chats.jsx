@@ -4,7 +4,6 @@ import Footer from "../layouts/Footer";
 import MessageBubble from "../components/MessageBubble";
 import MediaBubble from "../components/MediaBubble";
 import RenderFile from "../components/RenderFile";
-import useChat from "../store/useChat";
 import useApp from "../store/useApp";
 import ChatsSkeleton from "../skeletons/ChatsSkeleton";
 import NoChats from "../components/NoChats";
@@ -18,7 +17,7 @@ const Chats = () => {
         hasMore,
         loadingMore,
         selectedChat
-    } = useChat();
+    } = useChatStore();
 
     const { closeMedia, isMediaOpen } = useApp();
     const [searchParams] = useSearchParams();

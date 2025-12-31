@@ -17,9 +17,6 @@ const io = new Server(server, {
   maxHttpBufferSize: 1e6,
 });
 
-/* =========================
-   AUTH
-========================= */
 io.use((socket, next) => {
   try {
     const token = socket.handshake.auth?.token;
@@ -34,9 +31,6 @@ io.use((socket, next) => {
   }
 });
 
-/* =========================
-   CONNECTION
-========================= */
 io.on("connection", (socket) => {
   console.log(`[+] ${socket.username} connected`);
 
@@ -45,9 +39,6 @@ io.on("connection", (socket) => {
 
   socket.broadcast.emit("user:online", socket.userId);
 
-  /* =========================
-     SEND MESSAGE
-  ========================= */
   socket.on("message:send", ({ to, message }) => {
     const payload = {
       from: socket.userId,
@@ -56,40 +47,25 @@ io.on("connection", (socket) => {
       status: "sent",
       createdAt: new Date(),
     };
-
     // send to receiver room
     io.to(to).emit("message:receive", payload);
-
     // delivery ack
     socket.emit("message:delivered", {
       deliveredAt: new Date(),
     });
   });
-
-  /* =========================
-     READ RECEIPT
-  ========================= */
   socket.on("message:read", ({ from }) => {
     io.to(from).emit("message:read", {
       by: socket.userId,
       at: new Date(),
     });
   });
-
-  /* =========================
-     TYPING
-  ========================= */
   socket.on("typing:start", (to) => {
     socket.to(to).emit("typing:start", socket.userId);
   });
-
   socket.on("typing:stop", (to) => {
     socket.to(to).emit("typing:stop", socket.userId);
   });
-
-  /* =========================
-     DISCONNECT
-  ========================= */
   socket.on("disconnect", () => {
     socket.broadcast.emit("user:offline", socket.userId);
     console.log(`[-] ${socket.username} disconnected`);

@@ -3,13 +3,12 @@ import { GrAttachment } from "react-icons/gr";
 import { MdSend } from "react-icons/md";
 import { FaPlus } from "react-icons/fa";
 import axios from "axios";
-//import { v4 as uuidv4 } from "uuid";
-import useChat from "../store/useChat";
+import useChatStore from "../store/useChatStore";
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 const MAX_FILES = 6;
 
 const Footer = () => {
-    const { sendMessage, isSendingMessage } = useChat();
+    const { sendMessage, isSendingMessage } = useChatStore();
     const [text, setText] = useState("");
     const [files, setFiles] = useState([]); // { file, progress, uploadId }
     const textRef = useRef(null);
@@ -21,18 +20,14 @@ const Footer = () => {
         if (files.length + selectedFiles.length > MAX_FILES) {
             selectedFiles = selectedFiles.slice(0, MAX_FILES - files.length);
         }
-
         const filesWithMeta = selectedFiles.map(file => ({
             file,
             progress: 0,
             uploadId: Date.now() //uuidv4(),
         }));
-
         setFiles(prev => [...prev, ...filesWithMeta]);
-
         if (fileInputRef.current) fileInputRef.current.value = "";
     };
-
     // Remove file
     const removeFileAt = index => {
         setFiles(prev => {
@@ -41,14 +36,12 @@ const Footer = () => {
             return next;
         });
     };
-
     // Upload all files in parallel
     const handleSend = async () => {
         if (!text.trim() && files.length === 0) return;
         if (isSendingMessage) return;
         let trimdText = text.trim()
         let finalFiles = files
-
         setText("");
         setFiles([]);
         if (textRef.current) textRef.current.focus();

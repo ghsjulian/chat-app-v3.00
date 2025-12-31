@@ -1,12 +1,12 @@
 import React from "react";
-import useChat from "../store/useChat";
+import useChatStore from "../store/useChatStore";
 import useApp from "../store/useApp";
 import useAuth from "../store/useAuth";
 import timeAgo from "../auth/formatter";
 
 
 const MediaBubble = ({ chat }) => {
-    const { uploadProgress } = useChat();
+    const { uploadProgress } = useChatStore();
     const { previewMedia, api } = useApp();
     const { user } = useAuth();
     const isSender = user?._id === chat?.sender?._id;

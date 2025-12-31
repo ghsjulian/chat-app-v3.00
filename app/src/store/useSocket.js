@@ -1,118 +1,95 @@
 import { create } from "zustand";
 import { io } from "socket.io-client";
 import useAuth from "./useAuth";
-import useChat from "./useChat";
+import useChatStore from "./useChatStore";
 
 const SOCKET_SERVER = "http://localhost:3000";
 
 const useSocket = create((set, get) => ({
-  socket: null,
-  connected: false,
-  onlineUsers: [],
+    socket: null,
+    connected: false,
+    onlineUsers: [],
 
-  createSocket: () => {
-    if (get().socket) return;
+    createSocket: () => {
+        if (get().socket) return;
+        const user = useAuth.getState().user;
+        if (!user) return;
 
-    const user = useAuth.getState().user;
-    if (!user) return;
+        const socket = io(SOCKET_SERVER, {
+            path: "/socket.io",
+            transports: ["websocket"],
+            auth: { token: user },
+            autoConnect: false
+        });
 
-    const socket = io(SOCKET_SERVER, {
-      path: "/socket.io",
-      transports: ["websocket"],
-      auth: { token: user },
-      autoConnect: false,
-    });
+        socket.on("connect", () => {
+            set({ connected: true });
+        });
+        socket.on("user:online", userId => {
+            set({
+                onlineUsers: [...get().onlineUsers, userId]
+            });
+            console.log("ONLINE USERS : ", get().onlineUsers);
+        });
+        socket.on("disconnect", () => {
+            set({ connected: false });
+            console.log("User Disconnected");
+        });
+        socket.on("connect_error", err => {
+            console.error("Socket error:", err.message);
+        });
 
-    /* =======================
-       CORE
-    ======================= */
-    socket.on("connect", () => {
-      set({ connected: true });
-    });
+        socket.on("message:receive", msg => {
+            useChatStore.getState().mergeMessage(msg?.message);
+            // window.dispatchEvent(new CustomEvent("chat:message", { detail: msg }));
 
-    socket.on("user:online", (userId) => {
-      set({
-        onlineUsers: [...get().onlineUsers, userId],
-      });
-    });
+            // socket.emit("message:read", { from: msg.from });
+        });
+        socket.on("message:delivered", data => {
+            window.dispatchEvent(
+                new CustomEvent("chat:delivered", { detail: data })
+            );
+        });
+        socket.on("message:read", data => {
+            window.dispatchEvent(
+                new CustomEvent("chat:read", { detail: data })
+            );
+        });
+        socket.on("typing:start", userId => {
+            window.dispatchEvent(
+                new CustomEvent("chat:typing:start", { detail: userId })
+            );
+        });
+        socket.on("typing:stop", userId => {
+            window.dispatchEvent(
+                new CustomEvent("chat:typing:stop", { detail: userId })
+            );
+        });
+        socket.connect();
+        set({ socket });
+    },
 
-    socket.on("disconnect", () => {
-      set({ connected: false });
-    });
-
-    socket.on("connect_error", (err) => {
-      console.error("Socket error:", err.message);
-    });
-
-    /* =======================
-       RECEIVE MESSAGE
-    ======================= */
-    socket.on("message:receive", (msg) => {
-      useChat.getState().mergeMessage(msg?.message);
-      // window.dispatchEvent(new CustomEvent("chat:message", { detail: msg }));
-
-      // socket.emit("message:read", { from: msg.from });
-    });
-
-    /* =======================
-       DELIVERY
-    ======================= */
-    socket.on("message:delivered", (data) => {
-      window.dispatchEvent(new CustomEvent("chat:delivered", { detail: data }));
-    });
-
-    /* =======================
-       READ
-    ======================= */
-    socket.on("message:read", (data) => {
-      window.dispatchEvent(new CustomEvent("chat:read", { detail: data }));
-    });
-
-    /* =======================
-       TYPING
-    ======================= */
-    socket.on("typing:start", (userId) => {
-      window.dispatchEvent(
-        new CustomEvent("chat:typing:start", { detail: userId })
-      );
-    });
-
-    socket.on("typing:stop", (userId) => {
-      window.dispatchEvent(
-        new CustomEvent("chat:typing:stop", { detail: userId })
-      );
-    });
-
-    socket.connect();
-    set({ socket });
-  },
-
-  disconnectSocket: () => {
-    const socket = get().socket;
-    if (!socket) return;
-
-    socket.removeAllListeners();
-    socket.disconnect();
-    set({ socket: null, connected: false });
-  },
-
-  sendMessage: (to, message) => {
-    const socket = get().socket;
-    if (!socket || !get().connected) return;
-
-    socket.emit("message:send", {
-      to,
-      message,
-    });
-  },
-
-  startTyping: (to) => {
-    get().socket?.emit("typing:start", to);
-  },
-
-  stopTyping: (to) => {
-    get().socket?.emit("typing:stop", to);
-  },
+    disconnectSocket: () => {
+        const socket = get().socket;
+        if (!socket) return;
+        socket.removeAllListeners();
+        socket.disconnect();
+        set({ socket: null, connected: false });
+    },
+    sendMessage: (to, message) => {
+        const socket = get().socket;
+        if (!socket || !get().connected) return;
+        socket.emit("message:send", {
+            to,
+            message
+        });
+    },
+    startTyping: to => {
+        get().socket?.emit("typing:start", to);
+    },
+    stopTyping: to => {
+        get().socket?.emit("typing:stop", to);
+    }
 }));
 
 export default useSocket;

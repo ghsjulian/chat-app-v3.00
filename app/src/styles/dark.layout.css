@@ -163,6 +163,7 @@ body::-webkit-scrollbar,
     */
   transition: left 0.3s ease, width 0.3s ease;
   overflow: auto;
+  z-index: 900;
 }
 .dark .home-page {
   position: absolute;
