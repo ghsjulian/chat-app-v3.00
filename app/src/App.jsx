@@ -12,22 +12,35 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import VerifyOtp from "./pages/VerifyOtp";
 import ResetPassword from "./pages/ResetPassword";
+import useApp from "./store/useApp";
 import useAuth from "./store/useAuth";
 import useSocket from "./store/useSocket";
 
 const App = () => {
-     const { user } = useAuth();
+    const { user } = useAuth();
+    const { chatSettings } = useApp();
     const { createSocket, disconnectSocket, onlineUsers, connected } =
         useSocket();
     useEffect(() => {
         if (!user || connected) return;
         createSocket();
         // return () => {
-//             disconnectSocket();
-//         };
-    }, [user, createSocket, onlineUsers]);
-    
+        //             disconnectSocket();
+        //         };
+    }, [user, createSocket, onlineUsers,chatSettings]);
+    /*
+    let isDirty = true;
+    history.pushState(null, "", location.href);
 
+    window.addEventListener("popstate", () => {
+        if (isDirty) {
+            const confirmLeave = confirm("You have unsaved changes. Leave?");
+            if (!confirmLeave) {
+                history.pushState(null, "", location.href);
+            }
+        }
+    });
+*/
     return (
         <Router>
             <Routes>

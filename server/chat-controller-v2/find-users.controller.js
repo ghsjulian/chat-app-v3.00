@@ -24,7 +24,7 @@ const findUsers = async (req, res) => {
 
             return res.status(200).json({
                 type: "search",
-                success:true,
+                success: true,
                 users
             });
         }
@@ -38,9 +38,10 @@ const findUsers = async (req, res) => {
             .populate("participants", "name avatar")
             .populate({
                 path: "lastMessage",
-                select: "text createdAt"
+                select: "text createdAt seen sender"
             })
-            .sort({ updatedAt: -1 }).limit(15); // newest first
+            .sort({ updatedAt: -1 })
+            .limit(15); // newest first
 
         const recentChats = chats.map(chat => {
             const otherUser = chat.participants.find(
@@ -50,22 +51,29 @@ const findUsers = async (req, res) => {
             return {
                 chatId: chat._id,
                 _id: otherUser?._id,
-                sender: otherUser?._id,
+                sender: chat?.lastMessage?.sender,
                 name: otherUser?.name,
                 avatar: otherUser?.avatar,
-                lastMessage: chat.lastMessage?.text || "",
-                time: chat.lastMessage?.createdAt || chat.createdAt
+                lastMessage:
+                    chat.lastMessage?.text ||
+                    "sent a file",
+                    
+                time: chat.lastMessage?.createdAt || chat.createdAt,
+                seen: chat?.lastMessage?.seen
             };
         });
 
         return res.status(200).json({
             type: "recent",
-            success : true,
+            success: true,
             users: recentChats
         });
     } catch (error) {
         console.error("Find users error:", error);
-        res.status(500).json({success :false,message: "Something went wrong" });
+        res.status(500).json({
+            success: false,
+            message: "Something went wrong"
+        });
     }
 };
 

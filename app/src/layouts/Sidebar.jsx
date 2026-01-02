@@ -5,7 +5,6 @@ import { IoSearchOutline, IoSettingsOutline } from "react-icons/io5";
 import useApp from "../store/useApp";
 import useChatStore from "../store/useChatStore";
 import useSocket from "../store/useSocket";
-
 import User from "../components/User";
 import InboxSkeleton from "../skeletons/InboxSkeleton";
 import NoUser from "../components/NoUser";
@@ -30,7 +29,7 @@ const Sidebar = () => {
     useEffect(() => {
         setPath(location.pathname);
         getChatUsers();
-    }, [location.pathname]);
+    }, [location.pathname,getChatUsers]);
     useEffect(() => {
         const list = listRef.current;
         const onScroll = async () => {
@@ -55,7 +54,7 @@ const Sidebar = () => {
             await getChatUsers();
         }
     };
-
+    // console.log(chatUsers);
     return (
         <aside className={!isMenuActive ? "sidebar active-menu" : "sidebar"}>
             <div className="side-top">

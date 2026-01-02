@@ -32,6 +32,8 @@
     --active-chat: #f2f3f4;
     --online: #009e02;
     --offline: #869296;
+    --light-chat-header: #d5e0de;
+    --light-chat-footer: #d5e0de;
 }
 html {
     font-family: "Poppins", sans-serif;
@@ -125,7 +127,7 @@ body {
     left: 30.7%;
     width: 69.2%;
     height: 55px;
-    background: var(--app-container);
+    background: var(--light-chat-header);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -145,7 +147,7 @@ body {
     height: 45px;
     object-fit: cover;
     border-radius: 50%;
-    margin-right: 0.3rem;
+    margin-left: 0.7rem;
     border: 2px solid var(--text);
 }
 .white .chat-header .user .user-name {
@@ -157,11 +159,18 @@ body {
 .white .chat-header .user .user-name span {
     font-weight: 800;
     color: var(--blue);
+    font-size: 14px;
 }
 .white .chat-header .user .user-name p {
     font-weight: 800;
     color: var(--unread-msg);
-    font-size: 14px;
+    font-size: 12px;
+}
+.chat-header .user .user-name .active {
+    color: var(--online);
+}
+.chat-header .user .user-name .offline {
+    color: var(--offline);
 }
 .white .chatbox {
     position: absolute;
@@ -500,7 +509,7 @@ body {
     left: 30.7%;
     width: 69.2%;
     height: 55px;
-    background: var(--app-container);
+    background: var(--light-chat-footer);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -508,7 +517,7 @@ body {
     transition:
         left 0.3s ease,
         width 0.3s ease;
-        z-index: 900;
+    z-index: 900;
 }
 .white .selected-media {
     position: absolute;
@@ -699,6 +708,26 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.users-list a .budget {
+    position: absolute;
+    bottom: 5;
+    top: 20px;
+    right: 12px;
+}
+.users-list a .budget div {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    font-size: 11px;
+    border: 1px solid #e2e5e3;
+    background: #0094dd;
+    color: #fff;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+}
 .white .users-list a .right {
     position: absolute;
     bottom: 0;
@@ -792,6 +821,7 @@ body {
 }
 /* Message bubble base */
 .white .message {
+    position: relative;
     display: inline-block;
     max-width: min(80%, 560px);
     padding: 10px 12px;
@@ -839,7 +869,25 @@ body {
     text-align: right;
     opacity: 0.9;
 }
-
+.message .status {
+    position: absolute;
+    right: 0;
+    bottom: -17px;
+    width: 50px;
+    font-size: 10px;
+    background: transparent;
+    align-items: right;
+    text-align: right;
+}
+.message .sent {
+    color: #bbc1c0;
+}
+.message .delivered {
+    color: #20bbff;
+}
+.message .seen {
+    color: #00bd24;
+}
 /* Make timestamps lighter on sent bubbles */
 .white .message.sent .message-time {
     color: rgba(255, 255, 255, 0.85);

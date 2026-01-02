@@ -48,10 +48,17 @@ const useSocket = create((set, get) => ({
             console.error("Socket error:", err.message);
         });
 
-        socket.on("message:receive", msg => {
-            const selectedChat = useChatStore.getState().selectedChat
-            useChatStore.getState().mergeMessage(msg?.message);
-           // socket.emit("message:read", { from: msg.from });
+        socket.on("message:receive", async msg => {
+            const selectedChat = useChatStore.getState().selectedChat;
+
+            await useChatStore.getState().mergeMessage(msg);
+            if (selectedChat?._id === msg?.sender?._id) {
+                socket.emit("message:read", {
+                    from: msg?.sender?._id,
+                    msgId: msg?.tempId,
+                    status: "SEEN"
+                });
+            }
         });
         socket.on("message:delivered", data => {
             window.dispatchEvent(
@@ -59,7 +66,8 @@ const useSocket = create((set, get) => ({
             );
         });
         socket.on("message:read", data => {
-            const selectedChat = useChatStore.getState().selectedChat
+            const selectedChat = useChatStore.getState().selectedChat;
+            useChatStore.getState().updateStatus(data);
         });
         socket.on("typing:start", userId => {
             window.dispatchEvent(

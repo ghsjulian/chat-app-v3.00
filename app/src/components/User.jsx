@@ -11,11 +11,8 @@ const User = ({ chatUser }) => {
     const { user } = useAuth();
     const { onlineUsers } = useSocket();
     const { setSelectedChat } = useChatStore();
-    const isMe =
-        user?._id === chatUser?.sender?._id
-            ? chatUser?.sender?._id
-            : chatUser?._id;
-   // console.log(onlineUsers);
+    const isMe = user?._id === chatUser?.sender;
+
     return (
         <NavLink
             onClick={e => {
@@ -45,6 +42,9 @@ const User = ({ chatUser }) => {
                         </p>
                     )}
                 </div>
+            </div>
+            <div className="budget">
+                <div>5</div>
             </div>
             <div className="right">
                 {chatUser?.lastMessage && <time>{timeAgo(chatUser.time)}</time>}

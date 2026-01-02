@@ -1,5 +1,6 @@
 const Chat = require("../models/chat.model");
 const Message = require("../models/message.model");
+const { io, onlineUsers } = require("../socket/index");
 
 // ===============================
 // Send Message (WhatsApp style)
@@ -8,7 +9,7 @@ const sendMessage = async (req, res) => {
     try {
         const sender = req.user._id;
         const { id } = req.query;
-        const { text, files } = req.body;
+        const { text, files,tempId } = req.body;
 
         if (text === "" && files?.length == 0)
             return res.status(403).json({
@@ -39,7 +40,10 @@ const sendMessage = async (req, res) => {
             sender: sender,
             receiver: id,
             text: text || "",
-            files: files || []
+            files: files || [],
+            seen: onlineUsers[id] ? "DELIVERED" : "SENT",
+            createdAt: new Date(Date.now()).toISOString(),
+            tempId
         });
 
         // 4. Update chat lastMessage
@@ -49,12 +53,21 @@ const sendMessage = async (req, res) => {
         // 5. Populate sender & receiver for frontend
         await message.populate("sender", "name avatar");
         await message.populate("receiver", "name avatar");
-
-        return res.status(201).json({ success: true, newMessage: message, message: "Message sent successfully" });
+        // Send Event To Receiver
+        /*
+        if(onlineUsers[id]){
+        io.to(id).emit("message:receive", message);
+        }
+        */
+        return res.status(201).json({
+            success: true,
+            newMessage: message,
+            message: "Message sent successfully"
+        });
     } catch (error) {
         console.error("Send Message Error:", error);
         return res.status(500).json({ message: "Something went wrong" });
     }
 };
 
-module.exports = sendMessage 
+module.exports = sendMessage;

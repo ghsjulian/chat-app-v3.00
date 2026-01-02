@@ -4,13 +4,14 @@ import useApp from "../store/useApp";
 import useAuth from "../store/useAuth";
 import timeAgo from "../auth/formatter";
 
-
 const MediaBubble = ({ chat }) => {
-    const { uploadProgress } = useChatStore();
+    const { uploadProgress, currentChats } = useChatStore();
     const { previewMedia, api } = useApp();
     const { user } = useAuth();
     const isSender = user?._id === chat?.sender?._id;
-
+    const len = currentChats?.length - 1;
+    const isLast = currentChats[len]?.sender?._id === user?._id;
+    const lastId = currentChats[len]?._id;
 
     return (
         <div className={`message ${isSender ? "sent" : "received"}`}>
@@ -90,7 +91,12 @@ const MediaBubble = ({ chat }) => {
                       })}
             </div>
             {chat.text}
-            <div className="message-time">{timeAgo(chat.createdAt)}</div>
+            <div className="message-time">{timeAgo(chat?.createdAt)}</div>
+            {isLast && lastId === chat?._id && (
+                <div className={`status ${chat?.seen?.toLocaleLowerCase()}`}>
+                    {chat?.seen?.toLocaleLowerCase()}
+                </div>
+            )}
         </div>
     );
 };

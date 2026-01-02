@@ -77,6 +77,14 @@ const useApp = create((set, get) => ({
     },
     closeMedia: () => {
         set({ isMediaOpen: false,previewMediaObj:null });
+    },
+    saveAppSettings : (info)=>{
+        
+        set({chatSettings:info})
+        localStorage.setItem(
+                                "chat-settings",
+                                JSON.stringify(info)
+                            );
     }
 }));
 

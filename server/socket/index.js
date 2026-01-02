@@ -2,7 +2,7 @@ const { Server } = require("socket.io");
 const http = require("http");
 const express = require("express");
 const config = require("../configs");
-
+const messageModel = require("../models/message.model");
 const app = express();
 const server = http.createServer(app);
 
@@ -59,39 +59,24 @@ io.on("connection", socket => {
     onlineUsers[userId] = socket.id;
     // Send current online users to this socket
     io.emit("users:online:list", Object.keys(onlineUsers));
-
-    // Notify others only if user was offline before
-    // if (wasOffline) {
-    //         socket.broadcast.emit("user:online", userId);
-    //     }
-    // socket.broadcast.emit("user:online", userId);
-
     /* ===============================
        MESSAGING
     ================================ */
 
     socket.on("message:send", ({ to, message }) => {
-        const payload = {
-            from: userId,
-            to,
-            message,
-            status: "sent",
-            createdAt: new Date()
-        };
-        io.to(to).emit("message:receive", payload);
-        /*
-
-        socket.emit("message:delivered", {
-            deliveredAt: new Date()
-        });
-        */
+        io.to(to).emit("message:receive", message);
     });
 
-    socket.on("message:read", ({ from }) => {
+    socket.on("message:read", async ({ from, msgId, status }) => {
         io.to(from).emit("message:read", {
-            by: userId,
-            at: new Date()
+            from,
+            msgId,
+            status
         });
+        await messageModel.updateOne(
+  { tempId: msgId },
+  { $set: { seen: status } }
+);
     });
 
     socket.on("typing:start", to => {
@@ -120,4 +105,4 @@ io.on("connection", socket => {
     });
 });
 
-module.exports = { express, app, server, io };
+module.exports = { express, app, server, io, onlineUsers };

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import axios from "../libs/axios";
 import useAuth from "./useAuth";
+import useApp from "./useApp";
 import useSocket from "./useSocket";
 import {
     saveMessages,
@@ -34,7 +35,6 @@ const useChatStore = create((set, get) => ({
         set({ isFetchingChats: true });
         if (get().selectedChat?.chatId) {
             const localMessages = await getMessages(get().selectedChat.chatId);
-            console.log(localMessages);
             const last15 = localMessages.slice(-MESSAGES_PER_PAGE);
             set({ currentChats: last15, hasMore: true });
         }
@@ -229,6 +229,7 @@ const useChatStore = create((set, get) => ({
             const socketState = useSocket.getState();
             set({ isSendingMessage: true });
             let uploadedFiles = [];
+            const tempId = Date.now()
 
             const newMessage = {
                 sender: {
@@ -237,7 +238,11 @@ const useChatStore = create((set, get) => ({
                 receiver: get().selectedChat._id,
                 text,
                 files,
-                createdAt: Date.now()
+                seen: socketState?.onlineUsers?.includes(get().selectedChat._id)
+                    ? "DELIVERED"
+                    : "SENT",
+                createdAt: new Date(Date.now()).toISOString(),
+                tempId
             };
             set({
                 currentChats: [...get().currentChats, newMessage]
@@ -245,7 +250,6 @@ const useChatStore = create((set, get) => ({
             if (socketState.connected) {
                 socketState.sendMessage(get().selectedChat._id, newMessage);
             }
-            return;
             if (files.length > 0) {
                 uploadedFiles = await Promise.all(
                     files.map(fileObj => get().uploadFileChunks(fileObj))
@@ -256,6 +260,7 @@ const useChatStore = create((set, get) => ({
                     get().selectedChat.chatId
                 }`,
                 {
+                    tempId,
                     text,
                     files: uploadedFiles
                 }
@@ -268,8 +273,9 @@ const useChatStore = create((set, get) => ({
                 const updatedLocal = await getMessages(
                     get().selectedChat.chatId
                 );
-                // set({ chats: updatedLocal });
-                // console.log("NEW SENT MESSAGE - ", updatedLocal);
+                // await get().getChatUsers();
+               // set({ currentChats: updatedLocal });
+               // console.log("NEW SENT MESSAGE - ", updatedLocal);
             }
         } catch (err) {
             console.error(err.message);
@@ -277,11 +283,36 @@ const useChatStore = create((set, get) => ({
             set({ isSendingMessage: false });
         }
     },
-    mergeMessage : (message )=>{
+    mergeMessage: async message => {
         set({
-            currentChats : [...get().currentChats,message]
-        })
-        console.log("MERG MESSAGE : ",get().currentChats)
+            currentChats: [...get().currentChats, message]
+        });
+        await get().getChatUsers();
+        /*
+        set(state => ({
+            chatUsers: state.chatUsers.map(user => {
+                if (user?._id === message?.sender?._id) {
+                    return {
+                        ...user,
+                        lastMessage: message.text, // or message.text / message.content
+                        updatedAt: Date.now() // optional but recommended
+                    };
+                }
+                return user;
+            })
+        }));
+*/
+        // console.log("MERG MESSAGE : ", get().currentChats);
+    },
+    updateStatus: data => {
+        set(state => ({
+            currentChats: state.currentChats.map(chat =>
+                chat.tempId === data.msgId
+                    ? { ...chat, seen: data.status }
+                    : chat
+            )
+        }));
+        // console.log("UPDATED STATUS ", get().currentChats);
     }
 }));
 

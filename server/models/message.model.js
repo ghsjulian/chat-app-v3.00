@@ -28,10 +28,13 @@ const messageSchema = new mongoose.Schema(
     files: {
         type : Array,default:[]
     },
-
+    tempId : {
+        type : String,
+        default : ""
+    },
     seen: {
-      type: Boolean,
-      default: false
+      type: String,
+      default: "SENT"
     }
   },
   {
