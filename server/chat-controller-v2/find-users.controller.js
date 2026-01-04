@@ -38,7 +38,7 @@ const findUsers = async (req, res) => {
             .populate("participants", "name avatar")
             .populate({
                 path: "lastMessage",
-                select: "text createdAt seen sender"
+                select: "_id text createdAt seen sender"
             })
             .sort({ updatedAt: -1 })
             .limit(15); // newest first
@@ -59,7 +59,8 @@ const findUsers = async (req, res) => {
                     "sent a file",
                     
                 time: chat.lastMessage?.createdAt || chat.createdAt,
-                seen: chat?.lastMessage?.seen
+                seen: chat?.lastMessage?.seen,
+                messageId : chat?.lastMessage?._id
             };
         });
 

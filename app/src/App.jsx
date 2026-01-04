@@ -26,7 +26,6 @@ const App = () => {
     useEffect(() => {
         if (!user || connected) return;
         createSocket();
-        setStatus()
         // return () => {
         //             disconnectSocket();
         //         };
@@ -44,6 +43,9 @@ const App = () => {
         }
     });
 */
+useEffect(()=>{
+    setStatus()
+},[])
     return (
         <Router>
             <Routes>

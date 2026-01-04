@@ -319,8 +319,36 @@ const useChatStore = create((set, get) => ({
             )
         }));
     },
-    setStatus : async()=>{
-        console.log("ONLINE USER :B",useSocket.getState().onlineUsers)
+    setStatus: () => {
+        const socketState = useSocket.getState();
+        const currentUser = useAuth.getState()?.user?._id;
+
+        const users = get()
+            .chatUsers.filter(
+                user => user?.seen === "SENT" && user?.sender !== currentUser
+            )
+            .map(user => {
+                return {
+                    userId: user?._id,
+                    chatId: user?.chatId,
+                    msgId: user?.messageId
+                };
+            });
+
+        if (users.length == 0) return;
+        socketState.setDelivery(users);
+    },
+    setSeenStatus: data => {
+        /* 
+        set(state => ({
+            currentChats: state.currentChats.map(chat =>
+                chat.tempId === data.msgId
+                    ? { ...chat, seen: data.status }
+                    : chat
+            )
+        }));
+        */
+        console.log("SEEN DATA",data)
     }
 }));
 

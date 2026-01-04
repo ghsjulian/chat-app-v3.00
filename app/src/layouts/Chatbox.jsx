@@ -4,6 +4,7 @@ import Footer from "../layouts/Footer";
 import MessageBubble from "../components/MessageBubble";
 import MediaBubble from "../components/MediaBubble";
 import RenderFile from "../components/RenderFile";
+import useAuth from "../store/useAuth";
 import useApp from "../store/useApp";
 import useChatStore from "../store/useChatStore";
 import ChatsSkeleton from "../skeletons/ChatsSkeleton";
@@ -16,14 +17,15 @@ const Chatbox = () => {
         isFetchingChats,
         loadMoreMessages,
         hasMore,
-        loadingMore
+        loadingMore,
+        setSeenStatus
     } = useChatStore();
     const { selectedChat } = useChatStore();
     const { closeMedia, isMediaOpen } = useApp();
+    const { user } = useAuth();
     const containerRef = useRef(null); // scroll container
     const bottomRef = useRef(null); // bottom marker
     const isInitialLoad = useRef(true);
-
 
     useEffect(() => {
         isInitialLoad.current = true;
@@ -50,7 +52,14 @@ const Chatbox = () => {
             box.scrollHeight - box.scrollTop - box.clientHeight < 120;
         bottomRef.current?.scrollIntoView();
     }, [currentChats]);
+    useEffect(() => {
+        if(currentChats.length === 0) return 
+        const len = currentChats?.length-1;
+        const isReceiver = currentChats[len]?.receiver?._id === user?._id;
+        const lastId = currentChats[len]?._id;
 
+        setSeenStatus({ isReceiver, msgId: currentChats[len], status: "SEEN" });
+    }, [selectedChat]);
     return (
         <>
             <div className="chatbox">

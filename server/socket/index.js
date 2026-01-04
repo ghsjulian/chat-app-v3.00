@@ -74,9 +74,9 @@ io.on("connection", socket => {
             status
         });
         await messageModel.updateOne(
-  { tempId: msgId },
-  { $set: { seen: status } }
-);
+            { tempId: msgId },
+            { $set: { seen: status } }
+        );
     });
 
     socket.on("typing:start", to => {
@@ -85,6 +85,22 @@ io.on("connection", socket => {
 
     socket.on("typing:stop", to => {
         socket.to(to).emit("typing:stop", userId);
+    });
+    socket.on("delivery:status", async users => {
+        try {
+            let updatedResult;
+            updatedResult = await Promise.all(
+                users.map(user =>
+                    messageModel.updateOne(
+                        { _id: user.msgId },
+                        { $set: { seen: "DELIVERED" } }
+                    )
+                )
+            );
+            console.log("Updated Redult : ",updatedResult);
+        } catch (error) {
+            socket.to(userId).emit("error", error.message);
+        }
     });
 
     /* ===============================

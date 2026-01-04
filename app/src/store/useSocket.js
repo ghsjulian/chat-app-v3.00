@@ -103,6 +103,11 @@ const useSocket = create((set, get) => ({
     },
     stopTyping: to => {
         get().socket?.emit("typing:stop", to);
+    },
+    setDelivery: users => {
+        const socket = get().socket;
+        if (!socket) return;
+        get().socket?.emit("delivery:status", users);
     }
 }));
 
