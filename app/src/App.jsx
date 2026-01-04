@@ -15,15 +15,18 @@ import ResetPassword from "./pages/ResetPassword";
 import useApp from "./store/useApp";
 import useAuth from "./store/useAuth";
 import useSocket from "./store/useSocket";
+import useChatStore from "./store/useChatStore";
 
 const App = () => {
     const { user } = useAuth();
     const { chatSettings } = useApp();
+    const { setStatus } = useChatStore();
     const { createSocket, disconnectSocket, onlineUsers, connected } =
         useSocket();
     useEffect(() => {
         if (!user || connected) return;
         createSocket();
+        setStatus()
         // return () => {
         //             disconnectSocket();
         //         };

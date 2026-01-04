@@ -229,7 +229,7 @@ const useChatStore = create((set, get) => ({
             const socketState = useSocket.getState();
             set({ isSendingMessage: true });
             let uploadedFiles = [];
-            const tempId = Date.now()
+            const tempId = Date.now();
 
             const newMessage = {
                 sender: {
@@ -244,6 +244,17 @@ const useChatStore = create((set, get) => ({
                 createdAt: new Date(Date.now()).toISOString(),
                 tempId
             };
+            set(state => ({
+                chatUsers: state.chatUsers.map(user =>
+                    get().selectedChat?._id === user?._id
+                        ? {
+                              ...user,
+                              lastMessage: newMessage?.text,
+                              time: newMessage?.createdAt
+                          }
+                        : user
+                )
+            }));
             set({
                 currentChats: [...get().currentChats, newMessage]
             });
@@ -274,8 +285,8 @@ const useChatStore = create((set, get) => ({
                     get().selectedChat.chatId
                 );
                 // await get().getChatUsers();
-               // set({ currentChats: updatedLocal });
-               // console.log("NEW SENT MESSAGE - ", updatedLocal);
+                // set({ currentChats: updatedLocal });
+                // console.log("NEW SENT MESSAGE - ", updatedLocal);
             }
         } catch (err) {
             console.error(err.message);
@@ -287,22 +298,17 @@ const useChatStore = create((set, get) => ({
         set({
             currentChats: [...get().currentChats, message]
         });
-        await get().getChatUsers();
-        /*
         set(state => ({
-            chatUsers: state.chatUsers.map(user => {
-                if (user?._id === message?.sender?._id) {
-                    return {
-                        ...user,
-                        lastMessage: message.text, // or message.text / message.content
-                        updatedAt: Date.now() // optional but recommended
-                    };
-                }
-                return user;
-            })
+            chatUsers: state.chatUsers.map(user =>
+                user?.sender === message?.sender?._id
+                    ? {
+                          ...user,
+                          lastMessage: message?.text,
+                          time: message?.createdAt
+                      }
+                    : user
+            )
         }));
-*/
-        // console.log("MERG MESSAGE : ", get().currentChats);
     },
     updateStatus: data => {
         set(state => ({
@@ -312,7 +318,9 @@ const useChatStore = create((set, get) => ({
                     : chat
             )
         }));
-        // console.log("UPDATED STATUS ", get().currentChats);
+    },
+    setStatus : async()=>{
+        console.log("ONLINE USER :B",useSocket.getState().onlineUsers)
     }
 }));
 
