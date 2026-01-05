@@ -52,14 +52,20 @@ const Chatbox = () => {
             box.scrollHeight - box.scrollTop - box.clientHeight < 120;
         bottomRef.current?.scrollIntoView();
     }, [currentChats]);
-    useEffect(() => {
-        if(currentChats.length === 0) return 
-        const len = currentChats?.length-1;
-        const isReceiver = currentChats[len]?.receiver?._id === user?._id;
-        const lastId = currentChats[len]?._id;
 
-        setSeenStatus({ isReceiver, msgId: currentChats[len], status: "SEEN" });
-    }, [selectedChat]);
+    // SET SEEN WHILE FIRST TIME OPENING CHATS
+
+    useEffect(() => {
+        if (!currentChats || currentChats?.length === 0) return;
+        const len = currentChats?.length - 1;
+        const isReceiver = currentChats[len]?.receiver?._id === user?._id;
+        const msgId = currentChats[len]?.tempId;
+        const sender = currentChats[len]?.sender;
+        if(currentChats[len].seen === "SEEN") return 
+        if (!isReceiver) return;
+        setSeenStatus({ to: sender, msgId, status: "SEEN", len });
+    }, [currentChats, setSeenStatus]);
+
     return (
         <>
             <div className="chatbox">

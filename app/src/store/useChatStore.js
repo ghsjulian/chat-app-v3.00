@@ -339,16 +339,21 @@ const useChatStore = create((set, get) => ({
         socketState.setDelivery(users);
     },
     setSeenStatus: data => {
-        /* 
-        set(state => ({
-            currentChats: state.currentChats.map(chat =>
-                chat.tempId === data.msgId
-                    ? { ...chat, seen: data.status }
-                    : chat
-            )
-        }));
-        */
-        console.log("SEEN DATA",data)
+        const socketState = useSocket.getState();
+        const currentUser = useAuth.getState()?.user?._id;
+        let tempChats = get().currentChats;
+        tempChats[data.len].seen = "SEEN";
+        set({ currentChats: tempChats });
+        socketState.setSeen(data);
+    },
+    setSeenSuccess: data => {
+        const currentUser = useAuth.getState()?.user?._id;
+        let tempChats = get().currentChats;
+        tempChats[data.len+1].seen = "SEEN";
+        set({ currentChats: tempChats });
+
+        console.log("Sen success", get().currentChats);
+        console.log("Temp Chats ", get().currentChats[data.len]);
     }
 }));
 

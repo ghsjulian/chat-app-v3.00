@@ -97,7 +97,18 @@ io.on("connection", socket => {
                     )
                 )
             );
-            console.log("Updated Redult : ",updatedResult);
+        } catch (error) {
+            socket.to(userId).emit("error", error.message);
+        }
+    });
+    socket.on("seen:status", async data => {
+        try {
+            let updatedResult = await messageModel.updateOne(
+                { tempId: data.msgId },
+                { $set: { seen: "SEEN" } }
+            );
+        if(!onlineUsers[data?.to?._id]) return
+            io.to(data?.to?._id).emit("seen-status:success", data);
         } catch (error) {
             socket.to(userId).emit("error", error.message);
         }

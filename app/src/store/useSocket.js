@@ -69,6 +69,10 @@ const useSocket = create((set, get) => ({
             const selectedChat = useChatStore.getState().selectedChat;
             useChatStore.getState().updateStatus(data);
         });
+        socket.on("seen-status:success", data => {
+            const selectedChat = useChatStore.getState().selectedChat;
+            useChatStore.getState().setSeenSuccess(data);
+        });
         socket.on("typing:start", userId => {
             window.dispatchEvent(
                 new CustomEvent("chat:typing:start", { detail: userId })
@@ -108,6 +112,11 @@ const useSocket = create((set, get) => ({
         const socket = get().socket;
         if (!socket) return;
         get().socket?.emit("delivery:status", users);
+    },
+    setSeen: data => {
+        const socket = get().socket;
+        if (!socket) return;
+        get().socket?.emit("seen:status", data);
     }
 }));
 
