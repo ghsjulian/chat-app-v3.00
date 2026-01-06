@@ -23,7 +23,7 @@ const Layouts = () => {
         } else {
             document.body.style = "#ffffffff";
         }
-    }, []);
+    }, [chatSettings]);
 
     return (
         <main className={`main-container`}>

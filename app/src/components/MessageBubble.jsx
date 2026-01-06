@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import useAuth from "../store/useAuth";
 import useChatStore from "../store/useChatStore";
 import timeAgo from "../auth/formatter";
@@ -20,7 +20,7 @@ const MessageBubble = ({ chat }) => {
                     <div
                         className={`status ${chat?.seen?.toLocaleLowerCase()}`}
                     >
-                      {chat?.seen?.toLocaleLowerCase()}
+                        {chat?.seen?.toLocaleLowerCase()}
                     </div>
                 )}
             </div>

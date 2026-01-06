@@ -29,22 +29,21 @@ const useSocket = create((set, get) => ({
             set({
                 onlineUsers: users
             });
-            //console.log(users);
         });
 
         socket.on("user:offline", users => {
             set({
                 onlineUsers: users
             });
-            console.log(users);
         });
-        socket.on("disconnect", users => {
+        socket.on("disconnect", () => {
             set({
-                connected: false
+                connected: false,
+                socket: null
             });
-            console.log("User Disconnected");
         });
         socket.on("connect_error", err => {
+            set({ connected: false, socket: null });
             console.error("Socket error:", err.message);
         });
 
@@ -60,10 +59,8 @@ const useSocket = create((set, get) => ({
                 });
             }
         });
-        socket.on("message:delivered", data => {
-            window.dispatchEvent(
-                new CustomEvent("chat:delivered", { detail: data })
-            );
+        socket.on("message:delivery-status", data => {
+            useChatStore.getState().updateDelivery(data);
         });
         socket.on("message:read", data => {
             const selectedChat = useChatStore.getState().selectedChat;

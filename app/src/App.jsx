@@ -26,10 +26,11 @@ const App = () => {
     useEffect(() => {
         if (!user || connected) return;
         createSocket();
+        setStatus()
         // return () => {
         //             disconnectSocket();
         //         };
-    }, [user, createSocket, onlineUsers,chatSettings]);
+    }, [user, createSocket, onlineUsers]);
     /*
     let isDirty = true;
     history.pushState(null, "", location.href);
@@ -43,9 +44,7 @@ const App = () => {
         }
     });
 */
-useEffect(()=>{
-    setStatus()
-},[])
+
     return (
         <Router>
             <Routes>

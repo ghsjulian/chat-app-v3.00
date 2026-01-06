@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { GrAttachment } from "react-icons/gr";
+import { LuMessageCirclePlus } from "react-icons/lu";
 import { MdSend } from "react-icons/md";
 import { FaPlus } from "react-icons/fa";
 import axios from "axios";
@@ -40,8 +41,8 @@ const Footer = () => {
     const handleSend = async () => {
         if (!text.trim() && files.length === 0) return;
         if (isSendingMessage) return;
-        let trimdText = text.trim()
-        let finalFiles = files
+        let trimdText = text.trim();
+        let finalFiles = files;
         setText("");
         setFiles([]);
         if (textRef.current) textRef.current.focus();
@@ -77,7 +78,7 @@ const Footer = () => {
 
             <div className="input-wrapper">
                 <label htmlFor="files">
-                    <FaPlus size={27} />
+                    <LuMessageCirclePlus size={33} />
                 </label>
 
                 <input

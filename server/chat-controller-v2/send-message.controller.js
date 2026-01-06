@@ -9,7 +9,7 @@ const sendMessage = async (req, res) => {
     try {
         const sender = req.user._id;
         const { id } = req.query;
-        const { text, files,tempId } = req.body;
+        const { text, files,tempId,seen } = req.body;
 
         if (text === "" && files?.length == 0)
             return res.status(403).json({
@@ -40,8 +40,8 @@ const sendMessage = async (req, res) => {
             sender: sender,
             receiver: id,
             text: text || "",
+            seen,
             files: files || [],
-            seen: onlineUsers[id] ? "DELIVERED" : "SENT",
             createdAt: new Date(Date.now()).toISOString(),
             tempId
         });

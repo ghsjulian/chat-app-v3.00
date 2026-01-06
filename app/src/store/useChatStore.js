@@ -82,8 +82,6 @@ const useChatStore = create((set, get) => ({
                 set({ hasMore: false, loadingMore: false });
             }
         } catch (error) {
-            set({ loadingMore: false });
-        } finally {
             set({ loadingMore: false, hasMore: false });
         }
     },
@@ -244,6 +242,7 @@ const useChatStore = create((set, get) => ({
                 createdAt: new Date(Date.now()).toISOString(),
                 tempId
             };
+            get().playReceiveRingtone()
             set(state => ({
                 chatUsers: state.chatUsers.map(user =>
                     get().selectedChat?._id === user?._id
@@ -273,6 +272,7 @@ const useChatStore = create((set, get) => ({
                 {
                     tempId,
                     text,
+                    seen: newMessage.seen,
                     files: uploadedFiles
                 }
             );
@@ -349,11 +349,20 @@ const useChatStore = create((set, get) => ({
     setSeenSuccess: data => {
         const currentUser = useAuth.getState()?.user?._id;
         let tempChats = get().currentChats;
-        tempChats[data.len+1].seen = "SEEN";
+        tempChats[data.len + 1].seen = "SEEN";
         set({ currentChats: tempChats });
-
-        console.log("Sen success", get().currentChats);
-        console.log("Temp Chats ", get().currentChats[data.len]);
+    },
+    updateDelivery: data => {
+        let tempChats = get().currentChats;
+        const index = tempChats.map(c => c._id).lastIndexOf(data.msgId);
+        tempChats[index].seen = "DELIVERED";
+        set({ currentChats: tempChats });
+    },
+    playReceiveRingtone: () => {
+        const audio = new Audio("/ring.mp3");
+        audio.play().catch(error => {
+            console.error("Audio playback failed:", error);
+        });
     }
 }));
 

@@ -64,7 +64,7 @@ const Chatbox = () => {
         if(currentChats[len].seen === "SEEN") return 
         if (!isReceiver) return;
         setSeenStatus({ to: sender, msgId, status: "SEEN", len });
-    }, [currentChats, setSeenStatus]);
+    }, [selectedChat,currentChats, setSeenStatus]);
 
     return (
         <>

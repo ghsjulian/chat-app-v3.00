@@ -32,8 +32,8 @@
     --active-chat: #f2f3f4;
     --online: #009e02;
     --offline: #869296;
-    --light-chat-header: #d5e0de;
-    --light-chat-footer: #d5e0de;
+    --light-chat-header: #e7f0fa;
+    --light-chat-footer: #e7f0fa;
 }
 html {
     font-family: "Poppins", sans-serif;
@@ -141,6 +141,26 @@ body {
     display: flex;
     align-items: center;
     justify-content: left;
+}
+.chat-header .chat-action {
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    gap: 1rem;
+}
+.chat-action button {
+    outline: none;
+    border: none;
+    background: #e3e1e1;
+    border: 1px solid #fff;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.3rem;
+    cursor: pointer;
 }
 .white .chat-header .user img {
     width: 45px;
@@ -834,6 +854,10 @@ body {
     -webkit-user-select: text;
     user-select: text;
     touch-action: manipulation;
+    margin-bottom: 0.5rem;
+}
+.message {
+    margin-bottom: 0.5rem;
 }
 
 /* Received messages (left) */

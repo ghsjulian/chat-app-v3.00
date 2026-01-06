@@ -22,9 +22,6 @@ const io = new Server(server, {
     maxHttpBufferSize: 1e6
 });
 
-/* ===============================
-   AUTH MIDDLEWARE
-================================ */
 
 io.use((socket, next) => {
     try {
@@ -40,29 +37,17 @@ io.use((socket, next) => {
     }
 });
 
-/* ===============================
-   CONNECTION
-================================ */
-
 io.on("connection", socket => {
     const { userId, username } = socket;
 
-    console.log(`[+] ${username} connected → ${socket.id}`);
+    console.log(`\n[+] ${username} connected → ${socket.id}\n`);
 
     // One user = one room (multi-device safe)
     socket.join(userId);
-
-    /* ===============================
-       ONLINE STATUS
-    ================================ */
-
     onlineUsers[userId] = socket.id;
     // Send current online users to this socket
     io.emit("users:online:list", Object.keys(onlineUsers));
-    /* ===============================
-       MESSAGING
-    ================================ */
-
+    
     socket.on("message:send", ({ to, message }) => {
         io.to(to).emit("message:receive", message);
     });
@@ -97,6 +82,10 @@ io.on("connection", socket => {
                     )
                 )
             );
+            users?.forEach(user => {
+                if (!onlineUsers[user?.userId]) return;
+                io.to(user?.userId).emit("message:delivery-status", user);
+            });
         } catch (error) {
             socket.to(userId).emit("error", error.message);
         }
@@ -107,7 +96,7 @@ io.on("connection", socket => {
                 { tempId: data.msgId },
                 { $set: { seen: "SEEN" } }
             );
-        if(!onlineUsers[data?.to?._id]) return
+            if (!onlineUsers[data?.to?._id]) return;
             io.to(data?.to?._id).emit("seen-status:success", data);
         } catch (error) {
             socket.to(userId).emit("error", error.message);
@@ -119,8 +108,7 @@ io.on("connection", socket => {
     ================================ */
 
     socket.on("disconnect", () => {
-        console.log(`[-] ${username} disconnected → ${socket.id}`);
-
+        console.log(`\n[-] ${username} disconnected → ${socket.id}\n`);
         // Check remaining sockets in user's room
         const room = io.sockets.adapter.rooms.get(userId);
 

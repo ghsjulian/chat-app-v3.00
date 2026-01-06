@@ -259,7 +259,7 @@ const Settings = () => {
                                     ["isSound"]: !userInfo.isSound
                                 })),
                                     saveAppSettings({
-                                        isSound: userInfo.isSound,
+                                        isSound: !userInfo.isSound,
                                         appTheme: userInfo.appTheme,
                                         chatTheme: userInfo.chatTheme
                                     });
@@ -278,11 +278,11 @@ const Settings = () => {
                                 ...prev,
                                 ["appTheme"]: e.target.value
                             })),
-                            saveAppSettings({
+                                saveAppSettings({
                                     isSound: userInfo.isSound,
-                    appTheme: userInfo.appTheme,
-                    chatTheme: userInfo.chatTheme
-                                })
+                                    appTheme: e.target.value,
+                                    chatTheme: userInfo.chatTheme
+                                });
                         }}
                         value={userInfo.appTheme}
                     >
@@ -298,11 +298,11 @@ const Settings = () => {
                                 ...prev,
                                 ["chatTheme"]: e.target.value
                             })),
-                            saveAppSettings({
+                                saveAppSettings({
                                     isSound: userInfo.isSound,
-                    appTheme: userInfo.appTheme,
-                    chatTheme: userInfo.chatTheme
-                                })
+                                    appTheme: userInfo.appTheme,
+                                    chatTheme: e.target.value
+                                });
                         }}
                         value={userInfo.chatTheme}
                     >

@@ -1,0 +1,7 @@
+#  List of bugs
+1. Fixed the proper message seen status
+2. Add the notification sound on message delivery 
+3. Add the background color on header and footer
+4. Add the proper user friendly on change settings 
+5. Add online offline status in user chat header
+6. Proper user validation and OTP verification 
