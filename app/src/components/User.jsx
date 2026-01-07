@@ -43,9 +43,11 @@ const User = ({ chatUser }) => {
                     )}
                 </div>
             </div>
+            {chatUser?.unseenCount !== 0 &&
             <div className="budget">
-                <div>5</div>
+                <div>{chatUser?.unseenCount}</div>
             </div>
+            }
             <div className="right">
                 {chatUser?.lastMessage && <time>{timeAgo(chatUser.time)}</time>}
             </div>

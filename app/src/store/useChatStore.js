@@ -242,7 +242,6 @@ const useChatStore = create((set, get) => ({
                 createdAt: new Date(Date.now()).toISOString(),
                 tempId
             };
-            get().playReceiveRingtone()
             set(state => ({
                 chatUsers: state.chatUsers.map(user =>
                     get().selectedChat?._id === user?._id
@@ -294,7 +293,7 @@ const useChatStore = create((set, get) => ({
             set({ isSendingMessage: false });
         }
     },
-    mergeMessage: async message => {
+    mergeMessage: message => {
         set({
             currentChats: [...get().currentChats, message]
         });
@@ -304,7 +303,8 @@ const useChatStore = create((set, get) => ({
                     ? {
                           ...user,
                           lastMessage: message?.text,
-                          time: message?.createdAt
+                          time: message?.createdAt,
+                          unseenCount: user?.unseenCount + 1
                       }
                     : user
             )
@@ -344,6 +344,16 @@ const useChatStore = create((set, get) => ({
         let tempChats = get().currentChats;
         tempChats[data.len].seen = "SEEN";
         set({ currentChats: tempChats });
+        set(state => ({
+            chatUsers: state.chatUsers.map(user =>
+                get().selectedChat?._id === user?._id
+                    ? {
+                          ...user,
+                          unseenCount: 0
+                      }
+                    : user
+            )
+        }));
         socketState.setSeen(data);
     },
     setSeenSuccess: data => {
@@ -358,7 +368,7 @@ const useChatStore = create((set, get) => ({
         tempChats[index].seen = "DELIVERED";
         set({ currentChats: tempChats });
     },
-    playReceiveRingtone: () => {
+    playRingtone: () => {
         const audio = new Audio("/ring.mp3");
         audio.play().catch(error => {
             console.error("Audio playback failed:", error);

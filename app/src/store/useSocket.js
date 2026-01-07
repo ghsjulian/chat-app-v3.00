@@ -47,10 +47,11 @@ const useSocket = create((set, get) => ({
             console.error("Socket error:", err.message);
         });
 
-        socket.on("message:receive", async msg => {
+        socket.on("message:receive",  msg => {
             const selectedChat = useChatStore.getState().selectedChat;
 
-            await useChatStore.getState().mergeMessage(msg);
+            useChatStore.getState().playRingtone();
+            useChatStore.getState().mergeMessage(msg);
             if (selectedChat?._id === msg?.sender?._id) {
                 socket.emit("message:read", {
                     from: msg?.sender?._id,
