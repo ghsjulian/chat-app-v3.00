@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import {
-    BrowserRouter as Router,
-    Routes,
-    Route,
-    Navigate
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
 } from "react-router-dom";
 import Layouts from "./layouts/Layouts";
 import Settings from "./pages/Settings";
@@ -18,72 +18,45 @@ import useSocket from "./store/useSocket";
 import useChatStore from "./store/useChatStore";
 
 const App = () => {
-    const { user } = useAuth();
-    const { chatSettings } = useApp();
-    const { setStatus } = useChatStore();
-    const { createSocket, disconnectSocket, onlineUsers, connected } =
-        useSocket();
-    useEffect(() => {
-        if (!user || connected) return;
-        createSocket();
-        setStatus()
-        // return () => {
-        //             disconnectSocket();
-        //         };
-    }, [user, createSocket, onlineUsers]);
-    /*
-    let isDirty = true;
-    history.pushState(null, "", location.href);
+  const { user } = useAuth();
+  const { chatSettings } = useApp();
+  const { setStatus } = useChatStore();
+  const { createSocket, onlineUsers, connected } = useSocket();
+  useEffect(() => {
+    if (!user || connected) return;
+    createSocket();
+    //  setStatus()
+  }, [user, createSocket, onlineUsers]);
 
-    window.addEventListener("popstate", () => {
-        if (isDirty) {
-            const confirmLeave = confirm("You have unsaved changes. Leave?");
-            if (!confirmLeave) {
-                history.pushState(null, "", location.href);
-            }
-        }
-    });
-*/
-
-    return (
-        <Router>
-            <Routes>
-                <Route
-                    path="/"
-                    element={
-                        user && user._id ? (
-                            <Layouts />
-                        ) : (
-                            <Navigate to="/login" />
-                        )
-                    }
-                >
-                    <Route index element={<Home />} />
-                    <Route path="/settings" element={<Settings />} />
-                </Route>
-                <Route
-                    path="/signup"
-                    element={!user ? <Signup /> : <Navigate to="/" />}
-                />
-                <Route
-                    path="/login"
-                    element={!user ? <Login /> : <Navigate to="/" />}
-                />
-                <Route
-                    path="/verify-otp"
-                    element={
-                        user?.isVerified ? <Navigate to="/" /> : <VerifyOtp />
-                    }
-                />
-                <Route
-                    path="/reset-password"
-                    element={
-                        !user ? <Navigate to="/login" /> : <ResetPassword />
-                    }
-                />
-            </Routes>
-        </Router>
-    );
+  return (
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={user && user._id ? <Layouts /> : <Navigate to="/login" />}
+        >
+          <Route index element={<Home />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
+        <Route
+          path="/signup"
+          element={!user ? <Signup /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/login"
+          element={!user ? <Login /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/verify-otp"
+          element={user?.isVerified ? <Navigate to="/" /> : <VerifyOtp />}
+        />
+        <Route
+          path="/reset-password"
+          element={!user ? <Navigate to="/login" /> : <ResetPassword />}
+        />
+      </Routes>
+    </Router>
+  );
 };
 
 export default App;
