@@ -82,8 +82,7 @@ const useSocket = create((set, get) => ({
       // useChatStore.getState().updateDelivery(data);
     });
     socket.on("seen-status:success", (data) => {
-      // useChatStore.getState().setSeenSuccess(data);
-      console.log("Seen Success ", data);
+      useChatStore.getState().setSeenSuccess(data);
     });
     socket.on("typing:start", (userId) => {
       window.dispatchEvent(

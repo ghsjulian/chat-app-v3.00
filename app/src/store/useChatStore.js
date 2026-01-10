@@ -353,10 +353,11 @@ const useChatStore = create((set, get) => ({
     socketState?.setSeen(data);
   },
   setSeenSuccess: (data) => {
-    // let tempChats = get().currentChats;
-    // tempChats[data.len + 1].seen = "SEEN";
-    // set({ currentChats: tempChats });
-    console.log("Seen Succes : ", tempChats);
+    let tempChats = [...get().currentChats];
+    if (tempChats[data.len]) {
+    tempChats[data.len]?.seen = "SEEN" // Issues here...
+    set({ currentChats: tempChats });
+    };
   },
   updateDelivery: (data) => {
     let tempChats = get().currentChats;
