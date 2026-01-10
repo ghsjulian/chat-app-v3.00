@@ -5,11 +5,14 @@ import { IoVideocamOutline } from "react-icons/io5";
 import useSocket from "../store/useSocket";
 import useChatStore from "../store/useChatStore";
 import useApp from "../store/useApp";
+import useCall from "../store/useCall";
 
 const Header = () => {
     const { onlineUsers } = useSocket();
     const { toggleMenu } = useApp();
     const { selectedChat, setSelectedChat } = useChatStore();
+    const {isCalling,setCalling} = useCall() 
+    
     return (
         <header className="chat-header">
             <div className="user">
@@ -32,7 +35,7 @@ const Header = () => {
                 </div>
             </div>
             <div className="chat-action">
-            <button className="action-btn">
+            <button onClick={()=>setCalling(true)} className="action-btn">
                 <MdAddIcCall size={36} />
                 </button>
                  <button className="action-btn">

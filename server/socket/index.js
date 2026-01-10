@@ -105,11 +105,14 @@ io.on("connection", (socket) => {
       socket.to(userId).emit("error", error.message);
     }
   });
-
-  /* ===============================
-       DISCONNECT
-    ================================ */
-
+  
+  /*-------> Calling System <-------*/
+  socket.on("start:incoming-call",(info)=>{
+     if(!onlineUsers[info?.to_id]) return 
+      io.to(info?.to_id).emit("receive:incoming-call",info)
+  })
+  
+//       DISCONNECT
   socket.on("disconnect", () => {
     console.log(`\n[-] ${username} disconnected → ${socket.id}\n`);
     // Check remaining sockets in user's room

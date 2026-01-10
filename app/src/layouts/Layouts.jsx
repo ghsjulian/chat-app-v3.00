@@ -8,8 +8,12 @@ import "../styles/app.layout.css";
 import "../styles/dark.layout.css";
 import useApp from "../store/useApp";
 import useChatStore from "../store/useChatStore";
+import useCall from "../store/useCall";
+import AudioCall from "../components/AudioCall"
+
 
 const Layouts = () => {
+    const {isCalling,setCalling} = useCall() 
     const { chatSettings, path } = useApp();
     const { selectedChat } = useChatStore();
 
@@ -32,7 +36,9 @@ const Layouts = () => {
             if selected user then 
             show chat header<--*/}
             {selectedChat && selectedChat?._id && <><Chatbox/> <ChatHeader /></>}
-            
+          {
+              isCalling && <AudioCall />
+          }
             <Outlet />
         </main>
     );
