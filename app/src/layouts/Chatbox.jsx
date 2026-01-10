@@ -10,7 +10,6 @@ import useChatStore from "../store/useChatStore";
 import ChatsSkeleton from "../skeletons/ChatsSkeleton";
 import NoChats from "../components/NoChats";
 
-
 const Chatbox = () => {
   const {
     currentChats,
@@ -62,14 +61,18 @@ const Chatbox = () => {
     const isReceiver = currentChats[len]?.receiver?._id === user?._id;
     const msgId = currentChats[len]?.tempId;
     const sender = currentChats[len]?.sender;
+    const unreadIds = currentChats
+      ?.filter((chat) => chat?.seen !== "SEEN")
+      ?.map((chat) => chat?._id);
     if (currentChats[len].seen === "SEEN") return;
     if (!isReceiver) return;
-    //setSeenStatus({ to: sender, msgId, status: "SEEN", len });
+    setSeenStatus({ to: sender, msgId, status: "SEEN", len, unreadIds });
     console.log("Opend ChatBox : ", {
       to: sender,
       msgId,
       status: "SEEN",
       len,
+      unreadIds,
     });
   }, [selectedChat, currentChats, setSeenStatus]);
 
