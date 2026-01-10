@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { io } from "socket.io-client";
 import useAuth from "./useAuth";
 import useChatStore from "./useChatStore";
+import useCall from "./useCall";
 
 const SOCKET_SERVER = "http://localhost:3000";
 
@@ -97,11 +98,11 @@ const useSocket = create((set, get) => ({
                 new CustomEvent("chat:typing:stop", { detail: userId })
             );
         });
-        /*--------> Calling System Listener <--------*/ 
-        socket.on("receive:incoming-call",(info)=>{
-            console.log("Receive Call : ",info)
-        })
-        
+        /*--------> Calling System Listener <--------*/
+        socket.on("receive:incoming-call", data => {
+            useCall.getState().setReceiverCall(data);
+        });
+
         socket.connect();
         set({ socket });
     },

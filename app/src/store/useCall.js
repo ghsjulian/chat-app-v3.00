@@ -10,11 +10,14 @@ const useCall = create((set, get) => ({
     isCalling: false,
     isOnline: false,
     callTime: 0,
+    callType: "Calling",
+    callStatus: "START_INCOMMING_CALL",
 
     setCalling: type => {
         let caller = get().callerInfo;
         set({
             isCalling: type,
+            callType: "Calling...",
             callerInfo: useChatStore.getState().selectedChat
         });
         if (type) {
@@ -35,15 +38,34 @@ const useCall = create((set, get) => ({
         const user = useAuth.getState()?.user;
         const info = {
             type: "START_INCOMMING_CALL",
-            to_id: get().callerInfo?._id,
-            from_id: user?._id,
-            from_name: user?.name,
-            from_avatar: user?.avatar?.img_url
+            to: get().callerInfo,
+            from: user
         };
-        set({ isOnline: isOnline });
+        set({
+            isOnline: isOnline,
+            callType: isOnline ? "Ringing..." : "Calling..."
+        });
         useSocket.getState().startincommingCall(info);
     },
-    
+    setReceiverCall: caller => {
+        get().playRingtone()
+        set({
+            isCalling: true,
+            callType: "Incoming Call",
+            callerInfo: caller?.from,
+            callStatus: "START_RECEIVING_CALL"
+        });
+        useChatStore.setState({ selectedChat: null });
+    },
+    acceptIncomingCall: () => {
+        console.log("Accepting Call...");
+    },
+    playRingtone: () => {
+        const audio = new Audio("/incoming-call.mp3");
+        audio.play().catch(error => {
+            console.error("Audio playback failed:", error);
+        });
+    }
 }));
 
 export default useCall;
