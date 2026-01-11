@@ -25,11 +25,11 @@ const MediaBubble = ({ chat }) => {
                           if (type === "image") {
                               src = file.src_url;
                           } else if (type === "video") {
-                              src = "/video.png";
+                              src = "/icons/video.png";
                           } else if (type === "audio") {
-                              src = "/audio.png";
+                              src = "/icons/audio.png";
                           } else {
-                              src = "/file.png";
+                              src = "/icons/file.png";
                           }
                           return (
                               <div key={index} className="media-item">
@@ -53,11 +53,11 @@ const MediaBubble = ({ chat }) => {
                           if (type === "image") {
                               src = URL.createObjectURL(file.file);
                           } else if (type === "video") {
-                              src = "/video.png";
+                              src = "/icons/video.png";
                           } else if (type === "audio") {
-                              src = "/audio.png";
+                              src = "/icons/audio.png";
                           } else {
-                              src = "/file.png";
+                              src = "/icons/file.png";
                           }
                           return (
                               <div key={index} className="media-item">

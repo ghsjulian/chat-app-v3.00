@@ -24,7 +24,7 @@ const Header = () => {
                 >
                     <MdKeyboardBackspace size={36} />
                 </span>
-                <img src={selectedChat?.avatar?.img_url || "/boy.png"} />
+                <img src={selectedChat?.avatar?.img_url || "/icons/boy.png"} />
                 <div className="user-name">
                     <span>{selectedChat?.name}</span>
                     {onlineUsers.includes(selectedChat?._id) ? (

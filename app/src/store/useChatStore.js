@@ -367,7 +367,7 @@ const useChatStore = create((set, get) => ({
     set({ currentChats: tempChats });
   },
   playRingtone: () => {
-    const audio = new Audio("/ring.mp3");
+    const audio = new Audio("/audio/ring.mp3");
     audio.play().catch((error) => {
       console.error("Audio playback failed:", error);
     });

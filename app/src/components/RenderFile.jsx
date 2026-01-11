@@ -47,7 +47,7 @@ const RenderFile = () => {
                     objectFit: "cover",
                     borderRadius: "8px"
                 }}
-                src="/file.png"
+                src="/icons/file.png"
                 alt="Application File"
             />
         );

@@ -24,7 +24,7 @@ const User = ({ chatUser }) => {
         >
             <div className="left">
                 <div className="user-img">
-                    <img src={chatUser?.avatar?.img_url || "/boy.png"} />
+                    <img src={chatUser?.avatar?.img_url || "/icons/boy.png"} />
                     <div
                         className={`status ${
                             onlineUsers.includes(chatUser?._id)

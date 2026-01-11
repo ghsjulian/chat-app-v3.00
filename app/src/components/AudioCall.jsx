@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useRef } from "react";
 import useCall from "../store/useCall";
-import { MdCall } from "react-icons/md";
-import { MdCallEnd } from "react-icons/md";
+import { MdCall, MdCallEnd } from "react-icons/md";
 import { TbWindowMinimize } from "react-icons/tb";
 import { IoVolumeMuteOutline } from "react-icons/io5";
 import { GoUnmute } from "react-icons/go";
@@ -9,23 +8,23 @@ import { GoUnmute } from "react-icons/go";
 const AudioCall = () => {
     const {
         callerInfo,
-        isCalling,
         callType,
         callStatus,
-        isOnline,
         callTime,
         setCalling,
         acceptIncomingCall,
-        isMinimized,
         minimizeCall,
         toggleMute,
         isMuted
     } = useCall();
-    const localAudioRef = useRef();
-    const remoteAudioRef = useRef();
-    const peerRef = useRef(null);
-    const [remoteId, setRemoteId] = useState("");
 
+    const localAudioRef = useRef(null);
+    const remoteAudioRef = useRef(null);
+    const peerRef = useRef(null);
+
+    /* =====================================================
+     PEER CONNECTION SETUP
+     ===================================================== */
     const createPeer = async () => {
         peerRef.current = new RTCPeerConnection({
             iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
@@ -43,33 +42,96 @@ const AudioCall = () => {
         peerRef.current.ontrack = event => {
             remoteAudioRef.current.srcObject = event.streams[0];
         };
+
         peerRef.current.onicecandidate = event => {
             if (event.candidate) {
-                console.log("EVENT candidate : ", event.candidate);
+                console.log("ICE_CANDIDATE");
+                console.log(JSON.stringify(event.candidate));
+
+                /* 🔌 SOCKET PLACE
+           socket.emit("ice-candidate", event.candidate);
+        */
             }
         };
+    };
+
+    /* =====================================================
+     CALLER → CREATE OFFER
+     ===================================================== */
+    const startCall = async () => {
+        await createPeer();
+        const offer = await peerRef.current.createOffer();
+        await peerRef.current.setLocalDescription(offer);
+        console.log("OFFER_SDP");
+        console.log(JSON.stringify(offer));
+        /* 🔌 SOCKET PLACE
+       socket.emit("call-user", offer);
+    */
+    };
+
+    /* =====================================================
+     RECEIVER → ACCEPT OFFER + CREATE ANSWER
+     ===================================================== */
+    const acceptOffer = async offerFromConsole => {
+        await createPeer();
+
+        const offer = JSON.parse(offerFromConsole);
+        await peerRef.current.setRemoteDescription(offer);
+
+        const answer = await peerRef.current.createAnswer();
+        await peerRef.current.setLocalDescription(answer);
+
+        console.log("ANSWER_SDP");
+        console.log(JSON.stringify(answer));
+
+        /* 🔌 SOCKET PLACE
+       socket.emit("answer-call", answer);
+    */
+    };
+
+    /* =====================================================
+     CALLER → APPLY ANSWER
+     ===================================================== */
+    const applyAnswer = async answerFromConsole => {
+        const answer = JSON.parse(answerFromConsole);
+        await peerRef.current.setRemoteDescription(answer);
+        /* 🔌 SOCKET PLACE
+       socket.on("call-accepted", answer);
+    */
+    };
+
+    /* =====================================================
+     APPLY ICE CANDIDATE (BOTH SIDES)
+     ===================================================== */
+    const applyIceCandidate = async candidateFromConsole => {
+        const candidate = JSON.parse(candidateFromConsole);
+        await peerRef.current.addIceCandidate(candidate);
+        /* 🔌 SOCKET PLACE
+       socket.on("ice-candidate", candidate);
+    */
     };
 
     return (
         <div className="chatbox-call">
             <div
+                className="call-box"
                 style={{
                     backgroundImage: `url(${callerInfo?.avatar?.img_url})`,
                     backgroundColor: "rgba(0,0,0,0.6)",
                     backgroundBlendMode: "overlay"
                 }}
-                className="call-box"
             >
                 <img
                     className="user-image"
                     src={callerInfo?.avatar?.img_url}
                     alt={callerInfo?.name}
                 />
-                {callTime == 0 && <p>{callType}</p>}
+
+                {callTime === 0 && <p>{callType}</p>}
                 <h3>{callerInfo?.name}</h3>
                 {callStatus === "START_INCOMMING_CALL" ? (
                     <div className="action">
-                        <button onClick={createPeer} className="receive">
+                        <button className="receive">
                             <MdCall size={45} color="#ffffff" />
                         </button>
 
@@ -100,7 +162,7 @@ const AudioCall = () => {
                 ) : (
                     <div className="action">
                         <button
-                            onClick={acceptIncomingCall}
+                            onClick={acceptOffer}
                             title="Accept Call"
                             className="receive"
                         >
@@ -128,7 +190,7 @@ const AudioCall = () => {
                 )}
             </div>
             <audio ref={localAudioRef} autoPlay muted />
-      <audio ref={remoteAudioRef} autoPlay />
+            <audio ref={remoteAudioRef} autoPlay />
         </div>
     );
 };

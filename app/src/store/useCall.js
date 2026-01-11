@@ -64,7 +64,7 @@ const useCall = create((set, get) => ({
         console.log("Accepting Call...");
     },
     playRingtone: () => {
-        const audio = new Audio("/incoming-call.mp3");
+        const audio = new Audio("/audio/incoming-call.mp3");
         audio.play().catch(error => {
             console.error("Audio playback failed:", error);
         });
