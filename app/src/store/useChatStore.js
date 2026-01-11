@@ -353,9 +353,10 @@ const useChatStore = create((set, get) => ({
     socketState?.setSeen(data);
   },
   setSeenSuccess: (data) => {
-    let tempChats = [...get().currentChats];
+    let tempChats = get().currentChats;
     if (tempChats[data.len]) {
-    tempChats[data.len]?.seen = "SEEN" // Issues here...
+   // tempChats[data.len]?.seen = "SEEN" // Issues here...
+    console.log(tempChats)
     set({ currentChats: tempChats });
     };
   },

@@ -9,11 +9,11 @@ import "../styles/dark.layout.css";
 import useApp from "../store/useApp";
 import useChatStore from "../store/useChatStore";
 import useCall from "../store/useCall";
-import AudioCall from "../components/AudioCall"
-
+import AudioCall from "../components/AudioCall";
+import { MdCall } from "react-icons/md";
 
 const Layouts = () => {
-    const {isCalling,setCalling} = useCall() 
+    const { isCalling, setCalling,minimizeCall,isMinimized } = useCall();
     const { chatSettings, path } = useApp();
     const { selectedChat } = useChatStore();
 
@@ -35,10 +35,17 @@ const Layouts = () => {
             {/*-->Add a condition,
             if selected user then 
             show chat header<--*/}
-            {selectedChat && selectedChat?._id && <><Chatbox/> <ChatHeader /></>}
-          {
-              isCalling && <AudioCall />
-          }
+            {selectedChat && selectedChat?._id && (
+                <>
+                    <Chatbox /> <ChatHeader />
+                </>
+            )}
+            {isCalling && !isMinimized && <AudioCall />}
+            {isMinimized &&
+            <div onClick={()=>minimizeCall(false)} className="minimize-audio-call">
+                <MdCall size={40} color="#ffffffff" />
+            </div>
+            }
             <Outlet />
         </main>
     );

@@ -7,11 +7,14 @@ import useChatStore from "./useChatStore";
 
 const useCall = create((set, get) => ({
     callerInfo: null,
+    minimizedCaller: null,
     isCalling: false,
     isOnline: false,
     callTime: 0,
     callType: "Calling",
     callStatus: "START_INCOMMING_CALL",
+    isMinimized: false,
+    isMuted: false,
 
     setCalling: type => {
         let caller = get().callerInfo;
@@ -48,7 +51,7 @@ const useCall = create((set, get) => ({
         useSocket.getState().startincommingCall(info);
     },
     setReceiverCall: caller => {
-        get().playRingtone()
+        get().playRingtone();
         set({
             isCalling: true,
             callType: "Incoming Call",
@@ -65,6 +68,21 @@ const useCall = create((set, get) => ({
         audio.play().catch(error => {
             console.error("Audio playback failed:", error);
         });
+    },
+    minimizeCall: type => {
+        let caller = get().callerInfo;
+        set({ isMinimized: type });
+        if (type) {
+            useChatStore.setState({ selectedChat: caller });
+            set({ callerInfo: null ,minimizedCaller:caller});
+        } else {
+            const call = get().minimizedCaller;
+            useChatStore.setState({ selectedChat: null });
+            set({ callerInfo: call });
+        }
+    },
+    toggleMute: () => {
+        set({ isMuted: !get().isMuted });
     }
 }));
 
